@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <link rel="icon" type="image/gif/png" href="title.jpg" />
+    <title><%= title=="" ? "chưa thêm" : title%></title>
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/dist/css/style.css?ver=192" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="/plugins/jquery.datetimepicker.full.js"></script>
+    <link rel="stylesheet" type="text/css" href="/plugins/jquery.datetimepicker.css" />
+    <link href="/plugins/select2.css" rel="stylesheet" />
+    <script src="/plugins/select2.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
+
+    <%- defineContent('head') -%>
+</head>
+<body class="hold-transition layout-top-nav" style="min-width: 40rem;">
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand-md navbar-light navbar-white ">
+            <div class="container">
+                <a href="./TrangChu.aspx" class="navbar-brand">
+                    <span class="brand-text font-weight-light Label-vtv9">
+                        <img style="height: 35px;" src="/dist/images/123.png" /></span>
+                </a>
+                <div>
+                    <a href="#" class="navbar-brand">
+                        <span class="brand-text font-weight-light quayve"><i class="fas fa-user ffa-user"></i><%=Ten || "" %> </span>
+                    </a>
+                    <a href="./DangNhap.aspx" class="navbar-brand">
+                        <span class="brand-text font-weight-light quayve"><%=mUserId!="NULL"?"Đăng xuất":"Đăng nhập" %><i class="fas fa-sign-out-alt ffa-logout"></i></span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="content-wrapper">
+            <div class="content-header sticky-top">
+                <div class="height-100">
+                    <div class="row height-100">
+                        <div style="width: auto; margin: auto;" class="height-100">
+                            <ul class="breadcrumb float-sm-left height-100">
+                                <li class="breadcrumb padding-8"><a href="/" <%= Active=='home'?'class=active':''%> ><i class="fas fa-home display-block-center"></i>Trang chủ</a></li>
+                                <li class="breadcrumb padding-8"><a href="/event" <%= Active=='event'?'class=active':''%> ><i class="fas fa-calendar-week display-block-center"></i>Events</a></li>
+                                <!-- <li class="breadcrumb padding-8"><a href="./DanhSachPhieuYeuCau.aspx" ><i class="fas fa-edit display-block-center"></i>Phiếu yêu cầu</a></li> -->
+                                <li class="breadcrumb padding-8"><a href="/event/category" <%= Active=='eventCategory'?'class=active':''%> ><i class="fas fa-save display-block-center"></i>Event category</a></li>
+                                <li class="breadcrumb padding-8"><a href="/user" <%= Active=='user'?'class=active':''%> ><i class="fas fa-users display-block-center"></i>Users</a></li>
+                                <li class="breadcrumb padding-8 dropdown" data-toggle="dropdown"   id="navbarDropdown">
+                                    <a href="javascript:;" class='dropdown-toggle'>
+                                    <i class="fab fa-buromobelexperte display-block-center"></i>Thống kê</a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="#">Action</a>
+                                        <a class="dropdown-item" href="#">Another action</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                      </div>
+                                
+                                </li>
+                                
+                            </ul>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="container" style="width: 98vw">
+                    <form id="form1" >
+                        <div>
+                            <%- body %>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="/dist/js/adminlte.min.js"></script>
+
+        </div>
+    
+    </div>
+     <%- script %>
+</body>
+</html>

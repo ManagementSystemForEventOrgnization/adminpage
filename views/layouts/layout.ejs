@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <link rel="icon" type="image/gif/png" href="title.jpg" />
+    <title><%= title=="" ? "chưa thêm" : title%></title>
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/dist/css/style.css?ver=192" />
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="/plugins/jquery.datetimepicker.full.js"></script>
+    <link rel="stylesheet" type="text/css" href="/plugins/jquery.datetimepicker.css" />
+    <link href="/plugins/select2.css" rel="stylesheet" />
+    <script src="/plugins/select2.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
+    <link rel="stylesheet" href="/dist/css/chatBox.css?ver=192" />
+    <script src="/dist/js/shocket.io.js"></script>
+    <%- defineContent('head') -%>
+</head>
+<body class="hold-transition layout-top-nav" style="min-width: 40rem;">
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand-md navbar-light navbar-white ">
+            <div class="container">
+                <a href="./TrangChu.aspx" class="navbar-brand">
+                    <span class="brand-text font-weight-light Label-vtv9">
+                        <img style="height: 35px;" src="/dist/images/123.png" /></span>
+                </a>
+                <div>
+                    <a href="#" class="navbar-brand">
+                        <span class="brand-text font-weight-light quayve"><i class="fas fa-user ffa-user"></i><%=Ten || "" %> </span>
+                    </a>
+                    <a href="./DangNhap.aspx" class="navbar-brand">
+                        <span class="brand-text font-weight-light quayve"><%=mUserId!="NULL"?"Đăng xuất":"Đăng nhập" %><i class="fas fa-sign-out-alt ffa-logout"></i></span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="content-wrapper">
+            <div class="content-header sticky-top">
+                <div class="height-100">
+                    <div class="row height-100">
+                        <div style="width: auto; margin: auto;" class="height-100">
+                            <ul class="breadcrumb float-sm-left height-100">
+                                <li class="breadcrumb padding-8"><a href="/" <%= Active=='home'?'class=active':''%> ><i class="fas fa-home display-block-center"></i>Trang chủ</a></li>
+                                <li class="breadcrumb padding-8"><a href="/event" <%= Active=='event'?'class=active':''%> ><i class="fas fa-calendar-week display-block-center"></i>Events</a></li>
+                                <!-- <li class="breadcrumb padding-8"><a href="./DanhSachPhieuYeuCau.aspx" ><i class="fas fa-edit display-block-center"></i>Phiếu yêu cầu</a></li> -->
+                                <li class="breadcrumb padding-8"><a href="/event/category" <%= Active=='eventCategory'?'class=active':''%> ><i class="fas fa-save display-block-center"></i>Event category</a></li>
+                                <li class="breadcrumb padding-8"><a href="/user" <%= Active=='user'?'class=active':''%> ><i class="fas fa-users display-block-center"></i>Users</a></li>
+                                <!-- <li class="breadcrumb padding-8"><a href="/Account" <%= Active=='Account'?'class=active':''%> ><i class="fas fa-user-circle display-block-center"></i>Accounts</a></li> -->
+                                
+                                <li class="breadcrumb padding-8 dropdown" data-toggle="dropdown" id="navbarDropdown">
+                                    <a href="#" class='dropdown-toggle <%= Active=='Account'?'active':''%> ></a>'><i class="fas fa-cogs display-block-center"></i>Setting</a>
+                                </li>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="/Branch">Branches</a>
+                                    <a class="dropdown-item" href="/Department">Departments</a>
+                                    <a class="dropdown-item" href="/Account">Accounts</a>
+                                </div>
+                                
+                                
+                            </ul>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="container" style="width: 98vw">
+                    <form id="form1" >
+                        <div>
+                            <!-- <div class="round hollow text-center popup-box-on" id="addClass">
+                                <a href="#" ><i class="far fa-comment-dots"></i></a>
+                            </div> -->
+                            <%- body %>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+
+
+<!-- chat -->
+<div id='arrChatBox'>
+
+<div class="popup-box chat-popup popup-box-on showChatBox" id="qnimate">
+    <div class="popup-head" id='addClass'>
+        <div class="popup-head-left pull-left">Chat</div>
+        <!-- <div class="popup-head-right pull-right">
+            <button data-widget="remove" id="removeClass" class="chat-header-button pull-right " type="button"><i class="fas fa-times"></i></button>
+        </div> -->
+        <div  class="popup-head-right pull-right">35 online</div>
+    </div>
+    <!-- <hr/> -->
+    <div class="popup-messages" id='DanhSachUser' style="margin-bottom: 2px;">
+        
+        
+    </div>
+    
+    <div class="popup-messages-footer">
+        <input id="searchUser" style="height: 34px;" placeholder="Search.." rows="10" cols="5" name="message"></input>
+        
+    </div>
+</div>
+
+</div>
+        </div> 
+    </div>
+
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script> 
+    <script src="/dist/js/autoResize.js?ver=123"></script> 
+    <script src="/dist/js/chatBox.js?ver=123"></script> 
+
+     <%- script %>
+</body>
+</html>

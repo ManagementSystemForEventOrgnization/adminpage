@@ -1,0 +1,115 @@
+<%- contentFor('head') %>
+
+
+    <%- contentFor('body') %>
+        <div class="row" style="">
+            <div class="col-4" style="padding-bottom: 1rem">
+                <label class="margin-top"></label>
+                <select class="form-control" id="idSearch">
+                    <option value="">Lựa chọn ở đây</option>
+                    <option value="1">Đã duyệt</option>
+                    <option value="2">Đang chờ</option>
+                    <option value="3">Hủy</option>
+                    <option value="4">Đã giao</option>
+                </select>
+            </div>
+            <div class="col-8" style="padding-bottom: 1rem">
+                <a href="#" class="btn bg-gradient-success btn-themmoi"
+                    onclick="search1()" style="position: absolute; top: 3rem;
+                    display: block"><i class="fas fa-search"></i></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" style="margin: auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh sách users</h3>
+                        <a href="javascript:void(0);" id='btnAdd' class="btn
+                            bg-gradient-success btn-themmoi"><i class="fas
+                                fa-plus"></i></a>
+                    </div>
+                    <div class="card-body p-0" style="width: auto; overflow-x:
+                        auto;">
+                        <table class="table table-bordered" id="idDataTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">STT</th>
+                                    <th>Tên</th>
+                                    <th>Ảnh</th>
+                                    <th>Email</th>
+                                    <th>Giới tính</th>
+                                    <th>Năm sinh</th>
+                                    <th>Công việc</th>
+                                    <th>SĐT</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Chức năng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+
+        <div id="lightOrderDetail" class="white_content" style="width: 70%;
+            left: 15%; height: auto;">
+            <div class="box">
+                <div class="box-body">
+                    <div class="titlePouple" style="text-align: center;
+                        font-size: 2rem;" id="idTitlePopup">Thêm thông tin</div>
+                    <div id="OrderDetail" style="padding: 10px; text-align:
+                        center">
+                        <div class="row">
+                            <div class="col-4">
+                                <label class="margin-top">Tên</label>
+                                <input type="text" class="form-control"
+                                    placeholder="Nhập tên" id="idTen"
+                                    name="fullName" />
+                                    <span id="MessageTen" class="validationMessage hidden">Mã không được để trống</span>
+                            </div>
+                            <div class="col-4">
+                                <label class="margin-top">Email</label>
+                                <input type="email" class="form-control"
+                                    placeholder="Nhập email" id="idEmail"
+                                    name="email" />
+                                    <span id="MessageEmail" class="validationMessage hidden">Mã không được để trống</span>
+                            </div>
+                            <div class="col-4">
+                                <label class="margin-top">Password</label>
+                                <input type="password" class="form-control"
+                                    placeholder="Nhập Password" id="idPassword"
+                                    name="password" />
+                                    <span id="MessagePassword" class="validationMessage hidden">Mã không được để trống</span>
+                            </div>
+                        </div>
+                        <div class="box-footer" style="margin-top: 2rem;">
+                            <a class="btn btn-primary" id='buttonSave'>Xác nhận
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="fadeOrderDetail"
+            onclick="document.getElementById('lightOrderDetail').style.display=
+            'none'; document.getElementById('fadeOrderDetail').style.display=
+            'none'" class="black_overlay">
+        </div>
+
+
+
+        <%- contentFor('loadScript') %>
+            <script src='/js/user.js?ver=132'></script>
+            <script src='/js/search.js?ver=132'></script>
+
+            <script>
+        $(document).ready(function () {
+            TaoDataTable("idDataTable", GetColumnsForDatatable(10)).then(() => {
+                SettingSearch();
+            });
+        });
+    </script>

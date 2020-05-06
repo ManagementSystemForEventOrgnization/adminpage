@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ERRORS</title>
+    <!--Font-->
+    <link rel="stylesheet" href="../fonts/Open_Sans/open-sans.css">
+    <!--Bootstrap-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!--Font awesome-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <style>
+    body,html{
+        height: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container h-100">
+        <div class="row h-100 align-items-center">
+            <div class="col-md-12">
+                <div class="card w-50 shadow mx-auto">
+                    <div class="card-body text-center">
+                        <h1 class="card-title">Oops!!!</h1>
+                        <h5 class="text-danger"><%=message %></h5>
+                        <div class="stack text-monospace">
+                            <small><%=error.stack%></small>
+                        </div>
+                        <div class="my-4">
+                            <a href="/" class="btn btn-primary btn-lg">
+                                <i class="fa fa-home" aria-hidden="true"></i>
+                                Go home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const evenCategorySchema = new Schema({
-    name: { type: String, "index": "text" },
+    name: String,
     isDelete: { type: Boolean, default: false },
     updateAt: Date,
-    createAt: {type: Date, default: Date.now}
+    createAt: {type: Date, default: new Date()}
 })
 
 mongoose.model('eventCategory', evenCategorySchema);

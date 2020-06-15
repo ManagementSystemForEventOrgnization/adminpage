@@ -1,5 +1,6 @@
 const id = location.pathname.split("/")[3];
 customParams = "";
+idSession = "";
 function GetColumnsForDatatable(count) {
     var shit = new Array();
     for (var i = 0; i < count; i++) {
@@ -71,6 +72,7 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                     "data": function (d) {
                         d.myCustomParams = customParams;
                         d.idEvent = id;// idCongViec;
+                        d.idSession = idSession;
                         return d;
                     },
                     "dataSrc": function (json) {
@@ -101,8 +103,9 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
 
 function search1() {
-    customParams = $('#idSearch').val();
-    table.ajax.reload();
+    idSession = $('#idSearch').val();
+    console.log(idSession);
+        table.ajax.reload();
 }
 
 

@@ -8,3 +8,6 @@ require('../models/Payment');
 require('../models/Branch');
 require('../models/Department');
 require('../models/Account');
+require('../models/Thu');
+require('../models/Chi');
+

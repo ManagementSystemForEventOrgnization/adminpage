@@ -15,7 +15,7 @@
             </div>
             <div class="col-8" style="padding-bottom: 1rem">
                 <a href="#" class="btn bg-gradient-success btn-themmoi"
-                    onclick="search1()" style="position: absolute; top: 3rem;
+                    onclick="search1()" style="position: absolute; top: 2rem;
                     display: block"><i class="fas fa-search"></i></a>
             </div>
         </div>
@@ -104,8 +104,7 @@
 
         <%- contentFor('loadScript') %>
             <script src='/js/user.js?ver=132'></script>
-            <script src='/js/search.js?ver=132'></script>
-
+            <script src='/js/search.js?ver=132' async></script>
             <script>
         $(document).ready(function () {
             TaoDataTable("idDataTable", GetColumnsForDatatable(10)).then(() => {

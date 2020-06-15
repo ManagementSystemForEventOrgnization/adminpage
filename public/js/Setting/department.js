@@ -1,3 +1,4 @@
+var Base64 = { _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", encode: function (e) { var t = ""; var n, r, i, s, o, u, a; var f = 0; e = Base64._utf8_encode(e); while (f < e.length) { n = e.charCodeAt(f++); r = e.charCodeAt(f++); i = e.charCodeAt(f++); s = n >> 2; o = (n & 3) << 4 | r >> 4; u = (r & 15) << 2 | i >> 6; a = i & 63; if (isNaN(r)) { u = a = 64 } else if (isNaN(i)) { a = 64 } t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a) } return t }, decode: function (e) { var t = ""; var n, r, i; var s, o, u, a; var f = 0; e = e.replace(/[^A-Za-z0-9\+\/\=]/g, ""); while (f < e.length) { s = this._keyStr.indexOf(e.charAt(f++)); o = this._keyStr.indexOf(e.charAt(f++)); u = this._keyStr.indexOf(e.charAt(f++)); a = this._keyStr.indexOf(e.charAt(f++)); n = s << 2 | o >> 4; r = (o & 15) << 4 | u >> 2; i = (u & 3) << 6 | a; t = t + String.fromCharCode(n); if (u != 64) { t = t + String.fromCharCode(r) } if (a != 64) { t = t + String.fromCharCode(i) } } t = Base64._utf8_decode(t); return t }, _utf8_encode: function (e) { e = e.replace(/\r\n/g, "\n"); var t = ""; for (var n = 0; n < e.length; n++) { var r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r) } else if (r > 127 && r < 2048) { t += String.fromCharCode(r >> 6 | 192); t += String.fromCharCode(r & 63 | 128) } else { t += String.fromCharCode(r >> 12 | 224); t += String.fromCharCode(r >> 6 & 63 | 128); t += String.fromCharCode(r & 63 | 128) } } return t }, _utf8_decode: function (e) { var t = ""; var n = 0; var r = c1 = c2 = 0; while (n < e.length) { r = e.charCodeAt(n); if (r < 128) { t += String.fromCharCode(r); n++ } else if (r > 191 && r < 224) { c2 = e.charCodeAt(n + 1); t += String.fromCharCode((r & 31) << 6 | c2 & 63); n += 2 } else { c2 = e.charCodeAt(n + 1); c3 = e.charCodeAt(n + 2); t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63); n += 3 } } return t } }
 customParams = "";
 function GetColumnsForDatatable(count) {
     var shit = new Array();
@@ -56,6 +57,7 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                         "targets": -1,
                         "className": "hover",
                     },
+
                 ],
                 "processing": true,
                 "serverSide": true,
@@ -97,107 +99,92 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
     });
 }
 
+$('#btnAdd').click(() => {
+    let ten = $('#idTenSuKien').val().trim();
+    if (ten == "") {
+        alert('Bạn chưa nhập tên.');
+    } else {
+        $.ajax({
+            type: 'POST',
+            url: '/api/addDepartment',
+            data: { ten },
 
-function Delete(_id) {
+        }).done((data) => {
+            if (data.message != 'success') {
+                alert(`${data.message}`);
+            } else {
+                table.ajax.reload();
+                $('#idTenSuKien').val('');
+            }
+        }).fail(err => {
+            alert(err.responseJSON.message);
+        })
+    }
+
+});
+
+$('#btnSave').click(() => {
+
+    let ten = $('#idTenSuKien').val().trim();
+    let id = $('#idEventCategory').val().trim();
+    if (ten == "") {
+        alert('Bạn chưa nhập tên.');
+    } else {
+        $.ajax({
+            type: 'POST',
+            url: '/api/updateDepartment',
+            data: { ten, id },
+
+        }).done((data) => {
+
+            document.getElementById('btnAdd').classList.remove('hidden');
+            document.getElementById('btnSave').classList.add('hidden');
+            document.getElementById('btnCancel').classList.add('hidden');
+            table.ajax.reload();
+            $('#idTenSuKien').val('');
+            $('#idEventCategory').val('');
+
+        }).fail(err => {
+            alert(err.responseJSON.message);
+        })
+    }
+
+});
+
+$('#btnCancel').click(() => {
+    document.getElementById('btnAdd').classList.remove('hidden');
+    document.getElementById('btnSave').classList.add('hidden');
+    document.getElementById('btnCancel').classList.add('hidden');
+    $('#idTenSuKien').val('')
+    $('#idEventCategory').val('')
+
+});
+
+function Delete(id) {
     if (confirm('Xác nhận xóa!')) {
         $.ajax({
             type: 'POST',
-            url: '/api/deleteUser',
-            data: { _id },
+            url: '/api/deleteDepartment',
+            data: { id },
+
         }).done((data) => {
             if (data.message != 'success') {
                 alert(`${data.message}`);
             } else {
                 table.ajax.reload();
             }
-        }).fail(err=>{
-            alert(err.responseJSON.message);
         })
-
     }
 }
 
-function Update(id) {
-    // get data ve
+function Update(id, name) {
+    $('#idTenSuKien').val(`${Base64.decode(name)}`);
+    $('#idEventCategory').val(`${id}`)
+    document.getElementById('btnAdd').classList.add('hidden');
+    document.getElementById('btnSave').classList.remove('hidden');
+    document.getElementById('btnCancel').classList.remove('hidden');
 }
 
 function search1() {
-
     table.ajax.reload();
-}
-
-
-$(document).ready(function () {
-
-    $('#btnAdd').click(() => {
-        $('#idTitlePopup').text(`THÊM USER`);
-        document.getElementById('lightOrderDetail').style.display = 'block';
-        document.getElementById('fadeOrderDetail').style.display = 'block';
-    });
-
-    $('#buttonSave').click(() => {
-        let fullName = $('#idTen').val();
-        let email = $('#idEmail').val();
-        let password = $('#idPassword').val();
-
-        if (fullName == '' || email == '' || password == '') {
-            alert('Bạn chưa điền đủ thông tin');
-        } else {
-            if (confirm('Xác nhận lưu!')) {
-                $.ajax({
-                    type: 'POST',
-                    url: '/api/addUser',
-                    data: { fullName, email, password },
-                }).done((data) => {
-                    table.ajax.reload();
-                    $('#idTen').val('');
-                    $('#idEmail').val('');
-                    $('#idPassword').val('');
-                    document.getElementById('fadeOrderDetail').click();
-                }).fail((err) => {
-                    alert(err.responseJSON.message);
-                    console.log(err.responseJSON.message);
-                });
-            }
-        }
-
-    })
-
-    $('#idTen').on(`keyup`, debounce(validateKeyUp, 1000, 'idTen', 'MessageTen'));
-    $('#idEmail').on(`keyup`, debounce(validateKeyUp, 1000, 'idEmail', 'MessageEmail'));
-    $('#idPassword').on(`keyup`, debounce(validateKeyUp, 1000, 'idPassword', 'MessagePassword'));
-
-    function validateKeyUp(src, target) {
-        let val = $(`#${src}`).val();
-        let e = document.getElementById(src);
-        switch (e.type) {
-            case 'email':
-                let regex = /^[a-zA-Z][a-z0-9A-Z\.\_]{1,}@[a-z0-9]{2,}(\.[a-z0-9]{1,4}){1,2}$/gm
-                if (!regex.test(val)) {
-                    document.getElementById(target).classList.remove('hidden');
-                    document.getElementById(target).innerText = 'Email không hợp lệ';
-                } else {
-                    document.getElementById(target).classList.add('hidden');
-                }
-                break;
-            case 'password':
-                if (val.length < 3) {
-                    document.getElementById(target).classList.remove('hidden');
-                    document.getElementById(target).innerText = 'Mật khẩu phải > 3 kí tự';
-                } else {
-                    document.getElementById(target).classList.add('hidden');
-                }
-                break;
-            case 'text':
-                if (val == '') {
-                    document.getElementById(target).classList.remove('hidden');
-                    document.getElementById(target).innerText = 'Không được để trống';
-                } else {
-                    document.getElementById(target).classList.add('hidden');
-                }
-                break;
-        }
-
-    }
-
-});
+}   

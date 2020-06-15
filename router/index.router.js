@@ -10,5 +10,6 @@ router.get('/Branch', indexController.Branch);
 router.get('/Department', indexController.Department);
 router.get('/event/category', indexController.eventCategory);
 router.get('/event/applyEvent/:id', indexController.listApplyEvent);
+router.get('/traTienKhach', indexController.traTienKhach);
 
 module.exports = router;

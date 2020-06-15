@@ -1,4 +1,3 @@
-var bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const Event = mongoose.model('event');
 const User = mongoose.model('users');
@@ -7,17 +6,22 @@ const EventCategory = mongoose.model('eventCategory');
 const Branch = mongoose.model('branches');
 const Department = mongoose.model('departments');
 const Account = mongoose.model('accounts')
+const Thu = mongoose.model('thus');
+const Chi = mongoose.model('chis');
+
+var bcrypt = require('bcrypt');
 
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
 
-    Branch:async(req,res)=>{
-        let branch = await Branch.find({}); 
+    Branch: async (req, res) => {
+        let branch = await Branch.find({ isDelete: false });
         res.status(200).json(branch);
     },
-    Department:async(req,res)=>{
-        let department = await Department.find({}); 
+
+    Department: async (req, res) => {
+        let department = await Department.find({ isDelete: false });
         res.status(200).json(department);
     },
 
@@ -47,10 +51,9 @@ module.exports = {
             }
         }
     },
-
     deleteEventCategory: async (req, res) => {
         let { id } = req.body;
-        if (typeof id === undefined) {
+        if (!id) {
             res.status(200).json({ message: 'Thông tin không hợp lệ' });
         } else {
             try {
@@ -67,10 +70,9 @@ module.exports = {
         }
 
     },
-
     updateEventCategory: async (req, res) => {
         let { id, ten } = req.body;
-        if (typeof id === undefined) {
+        if (!id) {
             res.status(200).json({ message: 'Thông tin không hợp lệ' });
         } else {
             ten = ten.toUpperCase();
@@ -83,7 +85,7 @@ module.exports = {
                     res.status(200).json({ message: 'success' });
                 }
             } catch (error) {
-                res.status(200).json(error);
+                res.status(600).json({ message: 'Không tìm thấy thông tin' });
             }
         }
     },
@@ -114,7 +116,6 @@ module.exports = {
             res.status(600).json({ message: 'Email already exist' });
             return;
         }
-        password = bcrypt.hashSync(password, 10);
         const newUser = new User({
             email: email,
             fullName: fullName,
@@ -129,7 +130,6 @@ module.exports = {
             return;
         }
     },
-
     deleteUser: async (req, res) => {
         let { _id } = req.body;
         if (typeof _id === undefined) {
@@ -157,11 +157,11 @@ module.exports = {
             res.status(422).json({ message: 'Invalid data' });
             return;
         }
-        let {username, name, password, branch, department} = req.body;
-        
+        let { username, name, password, branch, department } = req.body;
+
         let accountFind = null;
         try {
-            accountFind = await Account.findOne({ username});
+            accountFind = await Account.findOne({ username });
         }
         catch (err) {
             res.status(500).json({ message: err });
@@ -171,10 +171,10 @@ module.exports = {
             res.status(600).json({ message: 'Email already exist' });
             return;
         }
-        password = bcrypt.hashSync(password, 10);
+
         const newUser = new Account({
             name, username,
-            hashPass: password,
+            password,
             branch, department
         });
         try {
@@ -186,7 +186,6 @@ module.exports = {
             return;
         }
     },
-
     deleteAccount: async (req, res) => {
         let { _id } = req.body;
         if (typeof _id === undefined) {
@@ -205,4 +204,246 @@ module.exports = {
         }
 
     },
+    updateAccount: async (req, res, next) => {
+
+    },
+
+    addBranch: async (req, res) => {
+        try {
+            if (typeof req.body.ten === undefined) {
+                res.status(600).json({ message: 'Thông tin không hợp lệ' });
+            } else {
+                let { ten } = req.body;
+                ten = ten.toUpperCase();
+
+                let branch = new Branch({ name: ten });
+                let check = await Branch.findOne({ 'name': ten });
+
+                if (check) {
+                    res.status(600).json({ message: 'Tên chi nhánh đã tồn tại!' })
+                } else {
+                    let save = await branch.save();
+                    if (!save) {
+                        res.status(600).json({ message: 'Lỗi không thêm vào được' })
+                    } else {
+                        res.status(200).json({ message: 'success' });
+                    }
+                }
+            }
+        } catch (error) {
+            res.status(600).json(error);
+        }
+    },
+    deleteBranch: async (req, res) => {
+        let { id } = req.body;
+        if (!id) {
+            res.status(600).json({ message: 'Thông tin không hợp lệ' });
+        } else {
+            try {
+                let isDelete = await Branch.findByIdAndUpdate({ _id: ObjectId(id) }, { $set: { "isDelete": true } });
+
+                if (isDelete) {
+                    res.status(200).json({ message: 'success' });
+                } else {
+                    res.status(600).json({ message: 'Xay ra loi' })
+                }
+            } catch (error) {
+                res.status(600).json({ message: 'Xảy ra lỗi. Mục xóa không tồn tại' });
+            }
+        }
+
+    },
+    updateBranch: async (req, res) => {
+        let { id, ten } = req.body;
+        if (!id) {
+            res.status(600).json({ message: 'Thông tin không hợp lệ' });
+        } else {
+            ten = ten.toUpperCase();
+
+            try {
+                let check = await Branch.findByIdAndUpdate({ _id: ObjectId(id) }, { 'name': ten });
+                if (!check) {
+                    res.status(600).json({ message: 'Thông tin chưa chính xác! Vui lòng thực hiện lại.' })
+                } else {
+                    res.status(200).json({ message: 'success' });
+                }
+            } catch (error) {
+                res.status(600).json({ message: 'Không tìm thấy thông tin' });
+            }
+        }
+    },
+
+    addDepartment: async (req, res) => {
+        try {
+            if (typeof req.body.ten === undefined) {
+                res.status(600).json({ message: 'Thông tin không hợp lệ' });
+            } else {
+                let { ten } = req.body;
+                ten = ten.toUpperCase();
+
+                let department = new Department({ name: ten });
+                let check = await Department.findOne({ 'name': ten });
+
+                if (check) {
+                    res.status(600).json({ message: 'Tên phòng ban đã tồn tại!' })
+                } else {
+                    let save = await department.save();
+                    if (!save) {
+                        res.status(600).json({ message: 'Lỗi không thêm vào được' })
+                    } else {
+                        res.status(200).json({ message: 'success' });
+                    }
+                }
+            }
+        } catch (error) {
+            res.status(600).json(error);
+        }
+    },
+    deleteDepartment: async (req, res) => {
+        let { id } = req.body;
+        if (!id) {
+            res.status(600).json({ message: 'Thông tin không hợp lệ' });
+        } else {
+            try {
+                let isDelete = await Department.findByIdAndUpdate({ _id: ObjectId(id) }, { $set: { "isDelete": true } });
+
+                if (isDelete) {
+                    res.status(200).json({ message: 'success' });
+                } else {
+                    res.status(600).json({ message: 'Xay ra loi' })
+                }
+            } catch (error) {
+                res.status(600).json({ message: 'Xảy ra lỗi. Mục xóa không tồn tại' });
+            }
+        }
+
+    },
+    updateDepartment: async (req, res) => {
+        let { id, ten } = req.body;
+        if (!id) {
+            res.status(600).json({ message: 'Thông tin không hợp lệ' });
+        } else {
+            ten = ten.toUpperCase();
+
+            try {
+                let check = await Department.findByIdAndUpdate({ _id: ObjectId(id) }, { 'name': ten });
+                if (!check) {
+                    res.status(600).json({ message: 'Thông tin chưa chính xác! Vui lòng thực hiện lại.' })
+                } else {
+                    res.status(200).json({ message: 'success' });
+                }
+            } catch (error) {
+                res.status(600).json({ message: 'Không tìm thấy thông tin' });
+            }
+        }
+    },
+
+    deleteEvent: async (req, res) => {
+        let { id, status } = req.body;
+        status = status || 'CANCEL';
+        if (!id) {
+            res.status(600).json({ message: 'Thông tin không hợp lệ' });
+        } else {
+            try {
+                let isDelete = await Event.findByIdAndUpdate({ _id: ObjectId(id) }, { $set: { "status": status } });
+
+                if (isDelete) {
+                    res.status(200).json({ message: 'success' });
+                } else {
+                    res.status(600).json({ message: 'Xay ra loi' })
+                }
+            } catch (error) {
+                res.status(600).json({ message: 'Xảy ra lỗi. Mục xóa không tồn tại' });
+            }
+        }
+
+    },
+
+
+    add_thu: async (req, res) => {
+        let object = { ...req.body };
+        // name, email, phone, type, note, amountMoney
+
+        if (!object.name) {
+            res.status(600).json({ error: { message: 'Invalid data' } });
+        }
+        let thu = new Thu({
+            ...object
+        });
+        let userThu = req.user;
+
+        thu.userThu = userThu;
+
+        let t = await thu.save();
+        if (!t) {
+            return res.status(600).json({ error: { message: 'Can\'t save' } });
+        }
+        res.status(200).json({ result: t });
+
+    },
+    deleteThu: async (req, res) => {
+        let { _id } = req.body;
+        if (!_id) {
+            res.status(600).json({ error: { message: 'Invalid data' } });
+            return;
+        }
+
+        let thu = await Thu.findByIdAndUpdate(_id, { dateDelete: Date.now() });
+        if (!thu) {
+            res.status(600).json({ error: { message: 'Phiếu thu không tồn tại' } });
+            return;
+        }
+
+        res.status(200).json({ result: thu });
+    },
+    updateThu: async (req, res) => {
+        let thuUpdate = { ...req.body };
+
+        let _id = req.body._id;
+
+        if (!_id) {
+            res.status(600).json({ error: { message: 'Invalid data' } });
+            return;
+        }
+        delete thuUpdate["_id"];
+        if (!Object.keys(thuUpdate).length) {
+            res.status(200).json({ result: 'Success' });
+            return;
+        }
+
+        let t = await Thu.findByIdAndUpdate(_id, thuUpdate);
+
+        if (!t) {
+            res.status(600).json({ error: { message: 'Something is wrong' } });
+            return;
+        }
+
+
+        res.status(200).json({result: t});
+
+    },
+
+    addChi: async (req, res) => {
+        let object = { ...req.body };
+
+        if (!object.name) {
+            res.status(600).json({ error: { message: 'Invalid data' } });
+        }
+        let chi = new Chi({
+            ...object
+        });
+
+        let userChi = req.user;
+        chi.userChi = userChi;
+        let c = await chi.save();
+        if (!c) {
+            res.status(600).json({ error: { message: 'Can\'t save' } });
+            return;
+        }
+        res.status(200).json({ result: c });
+    }
+
+
+
+
 };

@@ -6,26 +6,6 @@ function GetColumnsForDatatable(count) {
     }
     return shit;
 }
-function ThongBao(text, type, callback) {
-    var isShowCancel = true;
-    if (type == "success" || type == "error") {
-        isShowCancel = false;
-    }
-    Swal({
-        title: text,
-        type: type,
-        showCancelButton: isShowCancel,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Confirm',
-    }).then(function (result) {
-        if (typeof callback !== 'undefined')
-            if (result.value) {
-                callback(true);
-            } else
-                callback(false);
-    });
-}
 
 function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 

@@ -2,14 +2,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const bankAccountSchema = new Schema({
-    userId: Schema.Types.ObjectId,
+    userId: { type : Schema.Types.ObjectId , ref: 'users'},
     bankName: String,
     bankCode: String,
     branchName: String,
     branchCode: String,
     accountNumber: String,
     accountName: String,
-    createAt: { type: Date, default: Date() },
+    createAt: { type: Date, default: new Date() },
     updateAt: Date
 })
 

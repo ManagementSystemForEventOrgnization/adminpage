@@ -16,10 +16,13 @@ module.exports = app => {
 
     app.use(passport.initialize());
     app.use(passport.session());
-
+    
+    
     app.set('view engine', "ejs");
     app.set("views", "./views/layouts");
+
     app.use(expressLayouts);
+    app.set('layout', 'layout/layout');
     app.set('layout extractScripts', true)
     app.set('layout extractStyles', true)
 

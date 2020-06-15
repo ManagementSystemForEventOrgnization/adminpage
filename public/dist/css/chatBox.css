@@ -54,6 +54,7 @@
   width: 100%;
   font-family: Oswald;
   border-bottom: 1px solid #b2b2b2 !important;
+  border-top: 1px solid #b2b2b2 !important;
   cursor: pointer;
 }
 .popup-head:hover{
@@ -417,4 +418,10 @@
   position: absolute;
   left: 80%;
   top: 40%;
+}
+
+.loadMore{
+  font-size: 15px;
+  color: red;
+  cursor: pointer;
 }

@@ -10,17 +10,14 @@
     <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="/dist/css/style.css?ver=192" />
-    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/jquery/jquery.min.js" ></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script src="/plugins/jquery.datetimepicker.full.js"></script>
     <link rel="stylesheet" type="text/css" href="/plugins/jquery.datetimepicker.css" />
     <link href="/plugins/select2.css" rel="stylesheet" />
-    <script src="/plugins/select2.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet" />
-    <link rel="stylesheet" href="/dist/css/chatBox.css?ver=192" />
     <script src="/dist/js/shocket.io.js"></script>
-    <%- defineContent('head') -%>
+
+    <%- style -%>
 </head>
 <body class="hold-transition layout-top-nav" style="min-width: 40rem;">
     <div class="wrapper">
@@ -54,15 +51,29 @@
                                 <li class="breadcrumb padding-8"><a href="/user" <%= Active=='user'?'class=active':''%> ><i class="fas fa-users display-block-center"></i>Users</a></li>
                                 <!-- <li class="breadcrumb padding-8"><a href="/Account" <%= Active=='Account'?'class=active':''%> ><i class="fas fa-user-circle display-block-center"></i>Accounts</a></li> -->
                                 
-                                <li class="breadcrumb padding-8 dropdown" data-toggle="dropdown" id="navbarDropdown">
-                                    <a href="#" class='dropdown-toggle <%= Active=='Account'?'active':''%> ></a>'><i class="fas fa-cogs display-block-center"></i>Setting</a>
+                                <li class="breadcrumb padding-8 dropdown">
+                                    <!-- <a href="#" id="navbarDropdown111" class='dropdown-toggle <%= Active=='ThongKe'?'active':''%>' ><i class="fas fa-chart-bar display-block-center"></i>Thống kê</a> -->
+                                    <a  href="#" class="dropdown-toggle <%= Active=='ThongKe'?'active':''%>" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-chart-bar display-block-center"></i>Thống kê
+                                      </a>
+                                      <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                                        <a class="dropdown-item" href="/revenue">Thu</a>
+                                        <a class="dropdown-item" href="/Chi">Chi</a>
+                                        <a class="dropdown-item" href="/thongKeTuan">Thống kê tuần</a>
+                                        <a class="dropdown-item" href="/traTienKhach">Trả tiền khách</a>
+                                      </div>
                                 </li>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="/Branch">Branches</a>
-                                    <a class="dropdown-item" href="/Department">Departments</a>
-                                    <a class="dropdown-item" href="/Account">Accounts</a>
-                                </div>
-                                
+                                <li class="breadcrumb padding-8 dropdown">
+                                    <a href="#" class="dropdown-toggle <%= Active=='Account'?'active':''%>" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-cogs display-block-center"></i>Setting
+                                      </a>
+                                      <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                        <a class="dropdown-item" href="/Branch">Branches</a>
+                                        <a class="dropdown-item" href="/Department">Departments</a>
+                                        <a class="dropdown-item" href="/Account">Accounts</a>
+                                      </div>
+
+                                </li>
                                 
                             </ul>
                            
@@ -88,8 +99,8 @@
 
 <!-- chat -->
 <div id='arrChatBox'>
-
-<div class="popup-box chat-popup popup-box-on showChatBox" id="qnimate">
+    <!-- showChatBox -->
+<div class="popup-box chat-popup popup-box-on " id="qnimate">
     <div class="popup-head" id='addClass'>
         <div class="popup-head-left pull-left">Chat</div>
         <!-- <div class="popup-head-right pull-right">
@@ -112,12 +123,16 @@
 </div>
         </div> 
     </div>
-
-    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/dist/js/adminlte.min.js"></script> 
-    <script src="/dist/js/autoResize.js?ver=123"></script> 
-    <script src="/dist/js/chatBox.js?ver=123"></script> 
-
+    <script src="/plugins/select2.js" async></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="/plugins/jquery.datetimepicker.full.js" async> </script>
+    <link rel="stylesheet" href="/dist/css/chatBox.css?ver=192" />
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js" async></script>
+    <script src="/dist/js/adminlte.min.js" async></script> 
+    <script src="/dist/js/autoResize.js?ver=123" async></script> 
+    <script src="/dist/js/chatBox.js?ver=123" async></script> 
      <%- script %>
+
+
 </body>
 </html>

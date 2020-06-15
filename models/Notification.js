@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const notificationSchema = new Schema({
-    sender: Schema.Types.ObjectId,
-    receiver: [Schema.Types.ObjectId],
-    type: Number, // (Email, notify: (event: (apply, start event), payment))
+    sender: { type : Schema.Types.ObjectId , ref: 'users'},
+    receiver: [{ type : Schema.Types.ObjectId , ref: 'users'},],
+    type: String, // (event: (apply, start event), payment))
     message: String,
     title: String,
     linkTo: {
@@ -13,8 +13,9 @@ const notificationSchema = new Schema({
     },
     isRead: Boolean,
     isDelete: Boolean,
-    createAt: { type: Date, default: Date() },
-    updateAt: Date
+    createAt: { type: Date, default: new Date() },
+    updateAt: Date,
+    session: [String],
 })
 
 mongoose.model('notification', notificationSchema);

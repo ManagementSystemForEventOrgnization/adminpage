@@ -2,15 +2,13 @@
 
 
 <%- contentFor('body') %>
-    <div class="row" style="display:none;">
+    <div class="row" style="">
         <div class="col-4" style="padding-bottom: 1rem">
-            <label class="margin-top">Trạng thái</label>
+            <label class="margin-top">Session</label>
             <select class="form-control" id="idSearch">
-                <option value="">Lựa chọn ở đây</option>
-                <option value="1">Đã duyệt</option>
-                <option value="2">Đang chờ</option>
-                <option value="3">Hủy</option>
-                <option value="4">Đã giao</option>
+                <% for(let i = 0 ; i < event.session.length; i++){ %>
+                    <option value="<%=event.session[i].id %>"><%= new Date(event.session[i].day).getDate() %>/<%= new Date(event.session[i].day).getMonth() %>/<%= new Date(event.session[i].day).getFullYear() %> </option>
+                <% } %>
             </select>
         </div>
         <div class="col-8" style="padding-bottom: 1rem">
@@ -53,8 +51,7 @@
 
 <%- contentFor('loadScript') %>
     <script src='/js/applyEvent.js?ver=132'></script>
-    <script src='/js/search.js?ver=132'></script>
-    
+    <script src='/js/search.js?ver=132' async></script>
     <script>
         $(document).ready(function () {
             TaoDataTable("idDataTable", GetColumnsForDatatable(9)).then(() => {

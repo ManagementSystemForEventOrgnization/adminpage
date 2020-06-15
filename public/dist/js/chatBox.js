@@ -2,7 +2,7 @@ class ChatBox {
     constructor(arr) {
         this.arrBox = arr;
         this.lengthArr = arr.length;
-        this.maxLength = ~~(+window.innerWidth / 302)
+        this.maxLength = ~~((+window.outerWidth - 318) / 302);
         this.width = 318;
     }
 
@@ -46,7 +46,7 @@ class ChatBox {
                 </div>
             </div>
             <div class="popup-messages-footer">
-                <textarea id="chatContent${v.id}" data-element='${v}' style="height: 34px; line-height: none !important;" placeholder="Chat content.." rows="10" cols="5" name="message"></textarea>
+                <input id="chatContent${v.id}" style="height: 34px; line-height: none !important;" placeholder="Chat content.." rows="10" cols="5" name="message"></input>
             </div>
         </div>`
 
@@ -64,17 +64,19 @@ class ChatBox {
                 document.getElementById(v.id).classList.toggle('showChatBox');
                 $("#addClass").removeClass('popup-box-on');
             })
-            $(`#chatContent${v.id}`).autoResize();
-
             $(`#chatContent${v.id}`).keypress(function (event) {
                 if (event.keyCode === 13) {
-                    if (!event.shiftKey) {
-                        let content = $(`#chatContent${v.id}`).val();
-                        $(`#chatContent${v.id}`).val('');
-                        chatBox.appendAdminChat({ id: v.id, src: 'admin', content })
+                    let content = $(`#chatContent${v.id}`).val().trim();
 
-                        socket.emit('admin-sent-content', { src: 'admin', content, user: v })
-                    }
+                    if (content != '')
+                        if (!event.shiftKey) {
+
+                            $(`#chatContent${v.id}`).val('');
+                            chatBox.appendAdminChat({ id: v.id, src: 'admin', content })
+                            socket.emit('admin-sent-content', { src: 'admin', content, user: v })
+                            let message = document.getElementById(`contentChat${v.id}`);
+                            message.scrollTop = message.scrollHeight;
+                        }
                 }
             });
 
@@ -82,6 +84,95 @@ class ChatBox {
 
         }
 
+    }
+
+    loadMore(v, page) {
+        let index = this.arrBox.findIndex(u => u.id === v.id);
+        if (index !== -1) {
+            let pageNumber = page / 50; // /5
+            pageNumber++;
+            $.get(`/api/chat/get_list?sender=${v.id}&pageNumber=${pageNumber}`, (data, status) => {
+                // let arr = data.result;
+                let arr = data.result;
+                let user = v;
+                arr.reverse();
+                let func = () => {
+                    return new Promise((res, rej) => {
+                        arr.forEach(e => {
+                            if (e.sender != 'admin') {
+                                this.prependUserChat({ id: user.id, src: user.fullName, content: e.content })
+                            } else {
+                                this.prependAdminChat({ id: user.id, src: e.sender, content: e.content })
+                            }
+                        });
+                        res('true');
+                    })
+                }
+                func().then(d => {
+                    this.appendLoadMore(v);
+                })
+            });
+        }
+    }
+
+    appendLoadMore(v) {
+        $(`#contentChat${v.id} > .loadMore`).remove();
+        let page = $(`#contentChat${v.id} > .doted-border`).length;
+        if (page % 50 == 0) {
+            $(`#contentChat${v.id}`).prepend(`<div class='loadMore'>load more</div>`);
+
+            $(`#contentChat${v.id} > .loadMore`).click(() => {
+                chatBox.loadMore(v, page);
+            })
+
+        }
+    }
+
+    prependUserChat(v) {
+        let index = this.arrBox.findIndex(u => u.id === v.id);
+        if (index !== -1) {
+            let html = `<div class="direct-chat-msg doted-border">
+                            <div class="direct-chat-info clearfix">
+                                <span class="direct-chat-name pull-left">${v.src}</span>
+                            </div>
+                            <!-- /.direct-chat-info -->
+                            <img alt="iamgurdeeposahan"
+                                src="/avata.png"
+                                class="direct-chat-img"><!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                                ${v.content}
+                            </div>
+                            <!-- <div class="direct-chat-info clearfix">
+                                <span class="direct-chat-timestamp pull-right">3.36 PM</span>
+                            </div> -->
+                        </div>`;
+            $(`#contentChat${v.id}`).prepend(html);
+
+        }
+        return true;
+    }
+
+    prependAdminChat(v) {
+        let index = this.arrBox.findIndex(u => u.id === v.id);
+        if (index !== -1) {
+            let html = `<div class="direct-chat-msg doted-border">
+                            <div class="direct-chat-info clearfix">
+                                <span class="direct-chat-name-admin pull-right">${v.src}</span>
+                            </div>
+                            <!-- /.direct-chat-info -->
+                            <img alt="iamgurdeeposahan"
+                                src="/avata.png"
+                                class="direct-chat-img-right"><!-- /.direct-chat-img -->
+                            <div class="direct-chat-text-right">
+                                ${v.content}
+                            </div>
+                            <!-- <div class="direct-chat-info clearfix">
+                                <span class="direct-chat-timestamp pull-right">3.36 PM</span>
+                            </div> -->
+                        </div>`;
+            $(`#contentChat${v.id}`).prepend(html);
+        }
+        return true;
     }
 
     appendUserChat(v) {
@@ -103,13 +194,11 @@ class ChatBox {
                             </div> -->
                         </div>`;
             $(`#contentChat${v.id}`).append(html);
-            let message = document.getElementById(`contentChat${v.id}`);
-
-            message.scrollTop = message.scrollHeight;
         }
+        return true;
     }
 
-    appendAdminChat(v){
+    appendAdminChat(v) {
         let index = this.arrBox.findIndex(u => u.id === v.id);
         if (index !== -1) {
             let html = `<div class="direct-chat-msg doted-border">
@@ -127,11 +216,9 @@ class ChatBox {
                                 <span class="direct-chat-timestamp pull-right">3.36 PM</span>
                             </div> -->
                         </div>`;
-            $(`#contentChat${v.id}`).append(html);
-            let message = document.getElementById(`contentChat${v.id}`);
-
-            message.scrollTop = message.scrollHeight;
+            $(`#contentChat${v.id}`).append(html);;
         }
+        return true;
     }
 
     userLeave(user) {
@@ -143,8 +230,8 @@ class ChatBox {
 
 }
 
-var socket = io("http://localhost:5000/admin");
-
+// var socket = io("http://localhost:4000/admin");
+var socket = io("https://event-chat.herokuapp.com/admin");
 let chatBox = new ChatBox([]);
 let userActive = [];
 
@@ -161,7 +248,7 @@ socket.on("server-sent-user", function (data) {
 
 socket.on("newUserConnect", data => {
 
-    let u = userActive.findIndex(uu => uu.fullName === data.fullName);
+    let u = userActive.findIndex(uu => uu.id === data.id);
 
     if (u !== -1) {
         // user da co k can them vao maf chi can reset lai trang thi cua no neu can
@@ -176,8 +263,10 @@ socket.on("newUserConnect", data => {
 
 socket.on('userSentMessage', data => {
     let id = data.user.id; // thang nay moi la id dun
-    chatBox.appendUserChat({ id, src: data.data.fullName, content: data.data.content })
+    chatBox.appendUserChat({ id, src: data.user.fullName, content: data.data.content })
     $(`#numberMessage${id}`).text(data.user.number);
+    let message = document.getElementById(`contentChat${v.id}`);
+    message.scrollTop = message.scrollHeight;
 })
 
 socket.on('user-leave', user => {
@@ -192,46 +281,18 @@ socket.on('user-leave', user => {
     }
 })
 
-socket.on('chatValue', data => {
-    let id = data.value.data;
-    let arr = data.value.arr;
-    arr.forEach(e => {
-
-        console.log(e);
-        if(e.src!='admin'){
-            chatBox.appendUserChat({ id: id.data.id, src: e.src, content: e.content })
-        }else{
-            chatBox.appendAdminChat({ id: id.data.id, src: e.src, content: e.content })
-        }
-
-    //     let html = `<div class="direct-chat-msg doted-border">
-    //     <div class="direct-chat-info clearfix">
-    //         <span class="direct-chat-name pull-left">${e.src}</span>
-    //     </div>
-    //     <!-- /.direct-chat-info -->
-    //     <img alt="iamgurdeeposahan"
-    //         src="/avata.png"
-    //         class="direct-chat-img"><!-- /.direct-chat-img -->
-    //     <div class="direct-chat-text">
-    //         ${e.content}
-    //     </div>
-    //     <div class="direct-chat-info clearfix">
-    //         <span class="direct-chat-timestamp pull-right">3.36 PM</span>
-    //     </div>
-    //     <!-- /.direct-chat-text -->
-    // </div>`
-
-    //     $(`#contentChat${id.data.id}`).append(html);
-
-    });
-    let message = document.getElementById(`contentChat${id.data.id}`);
-    message.scrollTop = message.scrollHeight;
-});
 
 $(function () {
-    socket.emit("admin-vao", 'sang');
+    // socket.emit("admin-vao", 'sang');
 
+    $(window).resize(() => {
+        chatBox.maxLength = ~~((+window.outerWidth - 318) / 302);
+    })
 
+    if(sessionStorage.getItem('chatBox')==1){
+        document.getElementById('qnimate').classList.toggle('showChatBox');
+    }
+    
     socket.emit("getUser", data => {
         $("#boxContent").html("");
         userActive = [...data];
@@ -240,6 +301,7 @@ $(function () {
 
     $("#addClass").click(function () {
         document.getElementById('qnimate').classList.toggle('showChatBox');
+        sessionStorage.setItem('chatBox', $('.showChatBox').length);
     });
 
 
@@ -249,7 +311,6 @@ $(function () {
         //$("#addClass").addClass('popup-box-on');
     });
 
-    $("textarea").autoResize();
 })
 
 function resetChatBox(arr) {
@@ -280,8 +341,40 @@ function addNewUser(v) {
 
     $("#label" + v.id).click(function () {
         let u = userActive.find(v1 => v1.id == v.id);
+        let checkBoxExits = $(`#${u.id}`);
         chatBox.appendBox(u);
-        socket.emit('getContent', v);
+        if (!checkBoxExits[0]) {
+            $.get(`/api/chat/get_list?sender=${v.id}`, (data, status) => {
+
+                let user = v;
+                let arr = data.result;
+
+                let func = async () => {
+                    return new Promise((res, rej) => {
+                        arr.forEach(e => {
+                            if (e.sender != 'admin') {
+                                chatBox.prependUserChat({ id: user.id, src: user.fullName, content: e.content })
+                            } else {
+                                chatBox.prependAdminChat({ id: user.id, src: e.sender, content: e.content })
+                            }
+
+                        });
+                        res('res');
+                    })
+
+                }
+
+                func().then(dd => {
+                    let message = document.getElementById(`contentChat${v.id}`);
+                    message.scrollTop = message.scrollHeight;
+                    chatBox.appendLoadMore(v);
+                }
+                ).catch(er => {
+
+                })
+
+            })
+        }
     });
 }
 

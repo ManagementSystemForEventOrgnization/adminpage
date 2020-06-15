@@ -1,42 +1,64 @@
-<%- contentFor('head') %>
 
+ <link rel="stylesheet" href="/dist/css/event.css" />
+<link rel="stylesheet" href="/dist/css/popup.css">
 
 <%- contentFor('body') %>
-    <div class="row" style="display: none;">
-        <div class="col-4" style="padding-bottom: 1rem">
-            <label class="margin-top">Trạng thái</label>
-            <select class="form-control" id="idSearch">
-                <option value="">Lựa chọn ở đây</option>
-                <option value="1">Đã duyệt</option>
-                <option value="2">Đang chờ</option>
-                <option value="3">Hủy</option>
-                <option value="4">Đã giao</option>
-            </select>
+    <div class="row" >
+        <div class="col-10 row" style="padding-bottom: 1rem">
+            <div class="col-md-3 form-group">
+                <label class="margin-top">Trạng thái</label>
+                <select class="form-control" id="idTT">
+                    <option value="">Lựa chọn ở đây</option>
+                    <option value="DRAFT">DRAFT</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="CANCEL">CANCEL</option>
+                    <option value="PUBLIC">PUBLIC</option>
+                </select>
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="margin-top">Loại</label>
+                <div class="funkyradio">
+                    <div class="funkyradio-primary col-md-12" style="padding-left: 0px !important;">
+                        <input type="checkbox" name="traGop" value="true" id="traPhi" />
+                        <label style="height: calc(2.25rem + 2px)!important;" for="traPhi">Trả phí</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="margin-top">Ngày bắt đầu</label>
+                <input type="text" id="startDate" class="form-control col-sm-12 hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
+
+            </div>
+            <div class="col-md-3 form-group">
+                <label class="margin-top">Ngày kết thúc</label>
+                <input type="text" id="endDate" class="form-control col-sm-12 hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
+
+            </div>
+            
         </div>
-        <div class="col-8" style="padding-bottom: 1rem">
-            <a href="#" class="btn bg-gradient-success btn-themmoi"
+        <div class="col-2" style="padding-bottom: 1rem">
+            <a href="javascript: void(0);" class="btn bg-gradient-success btn-themmoi"
                 onclick="search1()" style="position: absolute; top: 3rem;
                 display: block"><i class="fas fa-search"></i></a>
-        </div>
+        
     </div>
     <div class="row">
         <div class="col-lg-12" style="margin: auto">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Danh sách sự kiện đã đăng kí</h3>
-                    
+                    <a class="card-title">Danh sách sự kiện đã đăng kí</a>
                 </div>
                 <div class="card-body p-0" style="width: auto; overflow-x:
                     auto;">
                     <table class="table table-bordered" id="idDataTable">
                         <thead>
                             <tr>
-                                <th style="width: 10px">STT</th>
-                                <th>Tên</th>
+                                <th style="width: 50px">STT</th>
+                                <th style="max-width: 300px!important;">Tên</th>
                                 <th>Người tạo</th>
-                                <th>Số lượng tối đa</th>
-                                <th>Số lượng đã tham gia</th>
-                                <th>Thời gian bắt đầu</th>
+                                <th>Loại event</th>
+                                <th>Số lượng sesion</th>
+                                <th>Thời gian tạo</th>
                                 <th style="min-width:150px!important;">Trạng thái</th>
                                 <th style='min-width:240px!important;'>Chức năng</th>
                             </tr>
@@ -51,11 +73,36 @@
         </div>
     </div>
 
+    <div id="lightOrderDetail" class="white_content" style="width: 80%;
+    left: 10%; top: 10%!important; height: 80vh; overflow-y: scroll;">
+    <div class="box" style="position: relative;">
+        <div style="position: absolute; top: 3px; right: 3px; font-size: 37px; color: red; cursor: pointer;" onclick="document.getElementById('lightOrderDetail').style.display=
+        'none'; document.getElementById('fadeOrderDetail').style.display=
+        'none'; $('#OrderDetail').text('');">X</div>
+        <div class="box-body">
+            <div class="titlePouple" style="text-align: center;
+                font-size: 2rem; width: 100%; height: auto!important;overflow-x: scroll;" id="idTitlePopup">Thêm thông tin</div>
+            <div id="OrderDetail" style="padding: 10px; text-align:
+                center">
+
+                <!-- <div class="box-footer" style="margin-top: 2rem;">
+                    <a class="btn btn-primary" id='buttonSave'>Xác nhận
+                    </a>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="fadeOrderDetail"
+    onclick="document.getElementById('lightOrderDetail').style.display=
+    'none'; document.getElementById('fadeOrderDetail').style.display=
+    'none'; $('#OrderDetail').text('');" class="black_overlay">
+</div>
 
 <%- contentFor('loadScript') %>
     <script src='/js/event.js?ver=132'></script>
-    <script src='/js/search.js?ver=132'></script>
-    
+    <script src='/js/search.js?ver=132' async></script>
+   
     <script>
         $(document).ready(function () {
             TaoDataTable("idDataTable", GetColumnsForDatatable(8)).then(() => {

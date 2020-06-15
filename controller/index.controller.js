@@ -1,11 +1,10 @@
-var bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const User = mongoose.model('users');
 const Event = mongoose.model('event');
 
 module.exports = {
-  home: async (req,res,next)=>{
+  home: async (req, res, next) => {
     res.locals = {
       title: 'Event',
       message: 'This is a message',
@@ -31,7 +30,7 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
-
+  
   user: async (req, res, next) => {
     res.locals = {
       title: 'Event',
@@ -59,7 +58,19 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
-  
+  traTienKhach: async (req, res, next) => {
+    res.locals = {
+      title: 'Người dùng',
+      message: 'This is a message',
+      Ten: 'sang',
+      mUserId: 'NULL',
+      Active: 'ThongKe'
+    };
+
+    res.render('ThongKe/traTienKhach', {
+      // additional locals, a custom layout, or other options can be defined here
+    });
+  },
   Branch: async (req, res, next) => {
     res.locals = {
       title: 'Người dùng',
@@ -103,8 +114,10 @@ module.exports = {
 
   listApplyEvent: async (req, res, next) => {
     let id = req.params.id; // đây là id của event .
+
     if (!id) {
       // thong bao loi cho nguoi dung chua co ai vao.
+      return next({ error: { message: 'Sự kiện không tồn tại' } });
     }
     // check xem id nay có trên db hay không.
     try {
@@ -118,9 +131,8 @@ module.exports = {
           message: 'This is a message',
           Ten: 'sang',
           mUserId: 'NULL',
-          Active: 'null'
+          Active: 'event'
         };
-
         res.render('applyEvent', {
           event: event
           // additional locals, a custom layout, or other options can be defined here

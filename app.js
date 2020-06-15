@@ -2,10 +2,6 @@ const express = require('express');
 const app = express();
 const keys = require('./config/key');
 const mongoose = require('mongoose');
-// let babel =  require("@babel/core").transform("code", {
-//     plugins: ["@babel/plugin-proposal-optional-chaining"]
-//   });
-
 mongoose.connect(keys.mongoURI,  {useNewUrlParser: true, useUnifiedTopology: true,'useCreateIndex': true, useFindAndModify: false });
 
 require('./config/configApp')(app);

@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const accountSchema = new Schema({
     name: { type:String, "index": "text" },
     username: { type:String, "index": "text" },
-    hashPass: String,
+    password: String,
     branch: Schema.Types.ObjectId,
     department: Schema.Types.ObjectId,
     createAt: { type: Date, default: Date() },

@@ -110,7 +110,7 @@ function Delete(_id) {
             } else {
                 table.ajax.reload();
             }
-        }).fail(err=>{
+        }).fail(err => {
             alert(err.responseJSON.message);
         })
 
@@ -129,30 +129,52 @@ function search1() {
 
 $(document).ready(function () {
 
+    (()=>{
+        $.post('/api/Branch',(data,status)=>{
+            let element = $('#idBranch');
+            data.forEach(e => {
+                element.append(`<option value='${e._id}' >${e.name}</option>`)
+            });
+        });
+
+        $.post('/api/Department', (data,status)=>{
+            let element = $('#idDepartment');
+            data.forEach(e => {
+                element.append(`<option value='${e._id}' >${e.name}</option>`)
+            });
+        });
+    }).call(this);
+
+    $('#idBranch').select2();
+    $('#idDepartment').select2();
     $('#btnAdd').click(() => {
-        $('#idTitlePopup').text(`THÊM USER`);
+        $('#idTitlePopup').text(`THÊM NGƯỜI DÙNG`);
+        // load data branch and department ra.
         document.getElementById('lightOrderDetail').style.display = 'block';
         document.getElementById('fadeOrderDetail').style.display = 'block';
     });
 
     $('#buttonSave').click(() => {
-        let fullName = $('#idTen').val();
-        let email = $('#idEmail').val();
+        let name = $('#idTen').val();
+        let username = $('#idUsername').val();
         let password = $('#idPassword').val();
-
-        if (fullName == '' || email == '' || password == '') {
+        let branch = $('#idBranch').val();
+        let department = $('#idDepartment').val();
+        if (name == '' || username == '' || password == '' || branch == '0' || department == '0') {
             alert('Bạn chưa điền đủ thông tin');
         } else {
             if (confirm('Xác nhận lưu!')) {
                 $.ajax({
                     type: 'POST',
-                    url: '/api/addUser',
-                    data: { fullName, email, password },
+                    url: '/api/addAccount',
+                    data: { name, username, password, branch, department },
                 }).done((data) => {
                     table.ajax.reload();
                     $('#idTen').val('');
-                    $('#idEmail').val('');
+                    $('#idUsername').val('');
                     $('#idPassword').val('');
+                    $('#idBranch').val('0');
+                    $('#idDepartment').val('0');
                     document.getElementById('fadeOrderDetail').click();
                 }).fail((err) => {
                     alert(err.responseJSON.message);
@@ -160,16 +182,18 @@ $(document).ready(function () {
                 });
             }
         }
-
     })
 
     $('#idTen').on(`keyup`, debounce(validateKeyUp, 1000, 'idTen', 'MessageTen'));
-    $('#idEmail').on(`keyup`, debounce(validateKeyUp, 1000, 'idEmail', 'MessageEmail'));
+    $('#idUsername').on(`keyup`, debounce(validateKeyUp, 1000, 'idUsername', 'MessageUsername'));
     $('#idPassword').on(`keyup`, debounce(validateKeyUp, 1000, 'idPassword', 'MessagePassword'));
 
     function validateKeyUp(src, target) {
         let val = $(`#${src}`).val();
         let e = document.getElementById(src);
+        let tagName = e.tagName;
+        let type = e.type;
+
         switch (e.type) {
             case 'email':
                 let regex = /^[a-zA-Z][a-z0-9A-Z\.\_]{1,}@[a-z0-9]{2,}(\.[a-z0-9]{1,4}){1,2}$/gm

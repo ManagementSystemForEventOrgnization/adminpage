@@ -1,5 +1,7 @@
 <%- contentFor('head') %>
-
+    <link href="/plugins/select2.css" rel="stylesheet" />
+    <script src="/plugins/select2.js"></script>   
+    <link rel="stylesheet" href="/dist/css/popup.css">
 
     <%- contentFor('body') %>
         <div class="row" style="">
@@ -15,7 +17,7 @@
             </div>
             <div class="col-8" style="padding-bottom: 1rem">
                 <a href="#" class="btn bg-gradient-success btn-themmoi"
-                    onclick="search1()" style="position: absolute; top: 3rem;
+                    onclick="search1()" style="position: absolute; top: 2rem;
                     display: block"><i class="fas fa-search"></i></a>
             </div>
         </div>
@@ -23,9 +25,9 @@
             <div class="col-lg-12" style="margin: auto">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Danh sách users</h3>
-                        <a href="javascript:void(0);" id='btnAdd' class="btn
-                            bg-gradient-success btn-themmoi"><i class="fas
+                        <h3  class="card-title" style="display: inline-block;">Danh sách users</h3>
+                        <a href="javascript:void(0);" style="float: right;" id='btnAdd' class="btn
+                            btn-primary btn-themmoi"><i class="fas
                                 fa-plus"></i></a>
                     </div>
                     <div class="card-body p-0" style="width: auto; overflow-x:
@@ -116,7 +118,7 @@
 
 
         <%- contentFor('loadScript') %>
-            <script src='/js/account.js?ver=132'></script>
+            <script src='/js/Setting/account.js?ver=132'></script>
             <script src='/js/search.js?ver=132'></script>
 
             <script>

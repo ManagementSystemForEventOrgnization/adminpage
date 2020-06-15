@@ -7,6 +7,7 @@ const userSchema = new Schema({
     dateCreate: {type: Date , default: Date.now },
     fullName: { type:String, "index": "text" },
     TOKEN: String,
+    google_id: String,
     birthday: Date,
     gender: { type:String, "index": "text" },
     typeUser: String,
@@ -16,9 +17,21 @@ const userSchema = new Schema({
     isReported: {type: Boolean, default: false},
     dateDelete: Date,
     discription: { type:String, "index": "text" },
-    phoneNumber: String,
+    address: String,
+    orgName : String,
+    orgDes : String,
+    orgWeb: String,
+    orgPhone: String,
+    orgEmail: String,
+    orgUrl: String,
+    bank: {
+        bankNumber: String,
+        bankName: String,
+        bankBranch: String,
+        accountOwner: String
+    },
     isActive:{type:Boolean,default: false},
-    createAt: { type: Date, default: Date() },
+    createAt: { type: Date, default: new Date() },
     updateAt: Date
 })
 

@@ -9,15 +9,16 @@ module.exports = {
             contents: {
                 'en': data,
             },
-            included_segments: ['All'],
-            filters: [
-                { field: 'tag', key: 'id', relation: '!=', value: 123 }
-            ]
+            included_segments: ["All"]
+            // "include_player_ids": ["2827de91-c8db-4874-9a2f-280ebd22cde1"],
         };
 
+            // filters: [
+            //     { field: 'tag', key: 'id', relation: '!=', value: 123 }
+            // ]
         try {
             const response = await client.createNotification(notification);
-            console.log(response.body);
+            return response.body;
         } catch (e) {
             if (e instanceof OneSignal.HTTPError) {
                 // When status code of HTTP response is not 2xx, HTTPError is thrown.
@@ -28,15 +29,13 @@ module.exports = {
 
     },
 
-    edit_device: async (id) => {
+    edit_device: async (id,name) => {
         const response = await client.editDevice(id, {
-            identifier: 'id2',
-            tags: { id: '123' }
+            tags: { name: name }
         });
-        console.log(response.body);
         return response;
-
     },
+
     get_all_user: async()=>{
         const response = await client.viewDevices({ limit: 200, offset: 0 });
         return response.body;

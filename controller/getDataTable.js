@@ -582,9 +582,9 @@ module.exports = {
 
         let query = {
             $and: [
-                // { isSellTicket: true },
-                // { ticket: { $exists: true } },
-                // { 'ticket.price': { $ne: 0 } },
+                { isSellTicket: true },
+                { ticket: { $exists: true } },
+                { 'ticket.price': { $ne: 0 } },
                 { 'session.isCancel': true }
             ]
         };
@@ -625,6 +625,7 @@ module.exports = {
                             as: "arrApply"
                         }
                     },
+                    { $match: { arrApply: { $not: { $size: 0 } } } },
                     {
                         $lookup: {
                             from: 'payments',
@@ -637,7 +638,7 @@ module.exports = {
                         $project: {
                             name: 1, cate: 1, user: 1, createdAt: 1, status: 1,
                             arrApply: 1,
-                            payment : 1,
+                            payment: 1,
                             'session': {
                                 $filter: {
                                     input: "$session",
@@ -646,7 +647,6 @@ module.exports = {
                                 }
                             }
                         },
-
                     },
                     { $skip: +PageNo },
                     { $limit: +pageSize },
@@ -673,7 +673,7 @@ module.exports = {
                     s5: `<div class="moveClick" onclick='ShowSession("${value._id}")'> <i class="fas fa-angle-double-up"></i> ${value.session.length || '0'}</div>`,
                     s6: formatDate(value.createdAt),
                     s7: value.status || 'PENDING',
-                    s8: ``
+                    s8: `<a title='Danh sách đăng kí' class='btn bg-primary' href="/event/apply_event_cancel/${value._id}" > <i class="fas fa-align-justify"></i> </a>`
 
 
                     // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>

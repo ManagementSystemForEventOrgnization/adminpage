@@ -11,7 +11,8 @@ const Chi = mongoose.model('chis');
 const Passport = require('passport');
 const { send_notification } = require('../utils/mainFunction');
 
-const notification = require('../utils/notification')
+const notification = require('../utils/notification');
+const { response } = require('express');
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -536,10 +537,17 @@ module.exports = {
 
     push_notification: async (req, res, next) => {
         let { content } = req.body;
-
+        console.log(content)
         const response = await notification.get_all_user();
-// console.log(response.body);
-        // let e = await create_notification(req.body.content) // edit_device(req.body.id);
+        // console.log(response.body);
+        // let response  = await notification.create_notification(req.body.content) // edit_device(req.body.id);
+        res.status(200).json(response);
+    },
+
+    edit_device : async (req,res,next)=>{
+        let {id, name} = req.body;
+
+        const response = await notification.edit_device(id,name);
         res.status(200).json(response);
     }
 

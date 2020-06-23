@@ -133,7 +133,7 @@ module.exports = {
 
         res.status(200).json({ result: e[0] });
     },
-    
+
     getSessionCancel: async (req, res, next) => {
         let { id } = req.params;
 
@@ -141,22 +141,9 @@ module.exports = {
             return res.status(404).json({ message: 'Event not exists!' })
         }
 
-        let e = await Event.findById(id,
-            {
-                session:
-                    { $elemMatch: { isCancel: true } },
-                name: 1, category: 1, userId: 1, createdAt: 1, status: 1,
-                isSellTicket: 1,
-                ticket: 1,
-                bannerUrl: 1,
-                urlWeb: 1
-            })
-            .populate("category").populate("userId")
-
-
         Promise.all([
             Event.aggregate([
-                {$match: {_id: ObjectId(id)}},
+                { $match: { _id: ObjectId(id) } },
                 {
                     $lookup:
                     {
@@ -166,41 +153,38 @@ module.exports = {
                         as: "userId"
                     }
                 },
-                {
-                    $unwind: "$userId"
-                },
+                { $unwind: '$userId' },
                 {
                     $lookup:
                     {
-                        from: "events",
-                        localField: "eventId",
+                        from: "eventcategories",
+                        localField: "category",
                         foreignField: "_id",
-                        as: "event"
+                        as: "category"
                     }
                 },
-                {
-                    $unwind: "$event"
-                },
+                { $unwind: '$category' },
                 {
                     $project: {
-                        event: 1, userId: 1, createdAt: 1,
+                        name: 1, isSellTicket: 1, ticket: 1, urlWeb: 1, userId: 1, createdAt: 1, category:1,
                         'session': {
                             $filter: {
                                 input: "$session",
                                 as: "item",
-                                cond: { $not: { $eq: ["$$item.isReject", true] } }
+                                cond: { $not: { $eq: ["$$item.isCancel", false] } }
                             }
                         }
                     }
                 },
             ])
-        ])
+        ]).then(([e]) => {
+            if (!e[0]) {
+                return res.status(404).json({ message: 'Event not exists!' })
+            }
 
-        if (!e) {
-            return res.status(404).json({ message: 'Event not exists!' })
-        }
+            res.status(200).json({ result: e[0] });
+        })
 
-        res.status(200).json({ result: e });
     },
 
     getList: async (req, res, next) => {
@@ -214,20 +198,20 @@ module.exports = {
             })
     },
 
-    get_list_report: async(req,res,next)=>{
-        let {_id} = req.query;
-        if(!_id){
-            res.status(400).json({error: 'Invalid data'});
+    get_list_report: async (req, res, next) => {
+        let { _id } = req.query;
+        if (!_id) {
+            res.status(400).json({ error: 'Invalid data' });
             return;
         }
         let u = await User.findById(_id).populate('userReport.userId').populate("userReport.eventId");
 
-        if(!u){
-            res.status(400).json({error: 'User is not exists!'});
+        if (!u) {
+            res.status(400).json({ error: 'User is not exists!' });
             return;
         }
         let arr = u.userReport;
-        res.status(200).json({result: {list: arr, userName : u.fullName}});
+        res.status(200).json({ result: { list: arr, userName: u.fullName } });
     }
 
 

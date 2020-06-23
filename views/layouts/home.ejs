@@ -1,15 +1,16 @@
-<%- contentFor('head') %>
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
   window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function() {
-    OneSignal.init({
-      appId: "5ec87a01-7411-46c9-ade1-6315c42b7f7c",
+    OneSignal.push(function() {
+      OneSignal.getUserId(function(userId) {
+      console.log("OneSignal User ID:", userId);
     });
-    console.log(OneSignal);
+    OneSignal.init({
+      appId: "31b8a0fd-e7e8-41a9-b1bc-50428eb4f48e",
+    });
   });
-  
 </script>
+
 
 <%- contentFor('body') %>
     <div class="row">

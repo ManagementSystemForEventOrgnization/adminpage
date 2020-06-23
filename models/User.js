@@ -7,17 +7,13 @@ const userSchema = new Schema({
     dateCreate: {type: Date , default: Date.now },
     fullName: { type:String, "index": "text" },
     TOKEN: String,
-<<<<<<< HEAD
     google_id: String,
-=======
->>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
     birthday: Date,
     gender: { type:String, "index": "text" },
     typeUser: String,
     job: String,
     phone: String,
     avatar: { type: String, default: '/avata.png'},
-<<<<<<< HEAD
     userReport: [
         {
             userId: { type :mongoose.Types.ObjectId, ref: 'users'},
@@ -44,14 +40,6 @@ const userSchema = new Schema({
     },
     isActive:{type:Boolean,default: false},
     createAt: { type: Date, default: new Date() },
-=======
-    isReported: {type: Boolean, default: false},
-    dateDelete: Date,
-    discription: { type:String, "index": "text" },
-    phoneNumber: String,
-    isActive:{type:Boolean,default: false},
-    createAt: { type: Date, default: Date() },
->>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
     updateAt: Date
 })
 

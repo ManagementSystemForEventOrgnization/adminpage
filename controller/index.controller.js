@@ -32,7 +32,7 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
-  
+
   user: async (req, res, next) => {
     res.locals = {
       title: 'Event',
@@ -144,7 +144,7 @@ module.exports = {
     }
   },
 
-  
+
   listApplyEventCancel: async (req, res, next) => {
     let id = req.params.id; // đây là id của event .
 
@@ -154,7 +154,19 @@ module.exports = {
     }
     // check xem id nay có trên db hay không.
     try {
-      let event = await Applyen
+      let event = await ApplyEvent.aggregate([
+        { $match: { eventId: ObjectId(id), session } },
+        {
+          $lookup: {
+            from: 'payments',
+            localField: 'session.paymentId',
+            foreignField: '_id',
+            as: 'payment'
+          }
+        }
+      ]);
+
+
       if (!event) {
         // thông báo ra là id nay không tồn tại.
       } else {
@@ -175,12 +187,12 @@ module.exports = {
     }
   },
 
-  login: async(req,res,next)=>{
+  login: async (req, res, next) => {
     res.locals = {
-        title: 'ApplyEvent',
-        message: 'This is a message',
-        layout: 'layout'
-      };
+      title: 'ApplyEvent',
+      message: 'This is a message',
+      layout: 'layout'
+    };
     res.render('login', {
     })
   }

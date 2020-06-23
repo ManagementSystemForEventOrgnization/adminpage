@@ -164,7 +164,6 @@ module.exports = {
         if (search != "") {
             query.$text = { $search: search };
         }
-
         let conditionQuery = {
             $expr: {
                 $and: [

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const applyEventSchema = new Schema({
+<<<<<<< HEAD
     userId: { type : Schema.Types.ObjectId , ref: 'users'},
     eventId: { type : Schema.Types.ObjectId, ref: 'event' },
     session: [
@@ -33,3 +34,14 @@ mongoose.model('applyEvent', applyEventSchema);
 // paymentId: Schema.Types.ObjectId,
 // isConfirm: Boolean, // check when take part in event
 // isReject: Boolean,
+=======
+    userId: Schema.Types.ObjectId,
+    eventId: Schema.Types.ObjectId,
+    isConfirm: Boolean,
+    qrcode: { type:String, "index": "text" },
+    createAt: { type: Date, default: Date() },
+    updateAt: Date
+})
+
+mongoose.model('applyEvent', applyEventSchema);
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea

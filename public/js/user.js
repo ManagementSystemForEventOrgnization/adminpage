@@ -1,5 +1,8 @@
 customParams = "";
+<<<<<<< HEAD
 isReport = false;
+=======
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
 function GetColumnsForDatatable(count) {
     var shit = new Array();
     for (var i = 0; i < count; i++) {
@@ -7,7 +10,30 @@ function GetColumnsForDatatable(count) {
     }
     return shit;
 }
+<<<<<<< HEAD
 
+=======
+function ThongBao(text, type, callback) {
+    var isShowCancel = true;
+    if (type == "success" || type == "error") {
+        isShowCancel = false;
+    }
+    Swal({
+        title: text,
+        type: type,
+        showCancelButton: isShowCancel,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirm',
+    }).then(function (result) {
+        if (typeof callback !== 'undefined')
+            if (result.value) {
+                callback(true);
+            } else
+                callback(false);
+    });
+}
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
 
 function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
@@ -50,7 +76,11 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                     "dataType": "JSON",
                     "data": function (d) {
                         d.myCustomParams = customParams;
+<<<<<<< HEAD
                         d.isReport = isReport;// idCongViec;
+=======
+                        d.idCongViec = "";// idCongViec;
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
                         return d;
                     },
                     "dataSrc": function (json) {
@@ -92,7 +122,11 @@ function Delete(_id) {
             } else {
                 table.ajax.reload();
             }
+<<<<<<< HEAD
         }).fail(err => {
+=======
+        }).fail(err=>{
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
             alert(err.responseJSON.message);
         })
 
@@ -103,6 +137,7 @@ function Update(id) {
     // get data ve
 }
 
+<<<<<<< HEAD
 function showPopupReport(_id) {
     document.querySelector('.lds-default').classList.toggle('hidden');
     $.ajax({
@@ -157,6 +192,10 @@ function banUser(id) {
 
 function search1() {
     isReport = $('#idReported:checkbox:checked').length
+=======
+function search1() {
+
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
     table.ajax.reload();
 }
 

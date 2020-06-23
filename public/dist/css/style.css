@@ -25,6 +25,7 @@
 }
 
 .pull-left {
+<<<<<<< HEAD
   float: left !important;
   /* text-align: left;
   padding-left: 17px;
@@ -33,6 +34,11 @@
 
 .pull-right {
   float: right !important;
+=======
+  text-align: left;
+  padding-left: 17px;
+  font-weight: 350;
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
 }
 
 .Label-vtv9 {
@@ -174,6 +180,10 @@
   border: 5px solid #00a65a;
   background-color: white;
   z-index: 1002;
+<<<<<<< HEAD
+=======
+  overflow: auto;
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
   border-radius: 3px;
 }
 
@@ -416,11 +426,19 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 .myImage {
   width: 4rem;
 }
+<<<<<<< HEAD
 .hidden {
   display: none !important;
 }
 
 /* processing loader*/
+=======
+.hidden{
+  display:none!important;
+}
+
+/* processing loader*/ 
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea
 .lds-roller {
   display: inline-block;
   position: relative;
@@ -504,6 +522,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
   100% {
     transform: rotate(360deg);
   }
+<<<<<<< HEAD
 }
 
 .funkyradio div {
@@ -620,3 +639,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
   font-size: 1.4rem;
   color: red;
 }
+=======
+}
+>>>>>>> 09d62626d4bc42558e1b9e7d32e0b81a0c9a7dea

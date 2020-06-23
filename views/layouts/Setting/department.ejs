@@ -1,0 +1,86 @@
+<%- contentFor('head') %>
+
+
+    <%- contentFor('body') %>
+        <div class="row" style="display: none;">
+            <div class="col-4" style="padding-bottom: 1rem">
+                <label class="margin-top">Trạng thái</label>
+                <select class="form-control" id="idSearch">
+                    <option value="">Lựa chọn ở đây</option>
+                    <option value="1">Đã duyệt</option>
+                    <option value="2">Đang chờ</option>
+                    <option value="3">Hủy</option>
+                    <option value="4">Đã giao</option>
+                </select>
+            </div>
+            <div class="col-8" style="padding-bottom: 1rem">
+                <a href="#" class="btn bg-gradient-success btn-themmoi"
+                    onclick="search1()" style="position: absolute; top: 3rem;
+                    display: block"><i class="fas fa-search"></i></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" style="margin: auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Danh sách loại event</h3>
+                        <div style='display: inline-block; float: right;'>
+                            <input type="text" class="form-control"
+                                style="width: 40vw; display: inline-block;
+                                margin-right: 2rem;"
+                                placeholder="Tên phòng ban" id="idTenSuKien"
+                                name="TenSuKien" />
+                            <a href="javascript:void(0);" title="Thêm mới"
+                                id='btnAdd' class="btn
+                                bg-gradient-success btn-themmoi"><i class="fas
+                                    fa-plus"></i></a>
+                            <a href="javascript:void(0);" title="Lưu lại"
+                                id='btnSave'
+                                class="btn bg-gradient-success btn-themmoi
+                                hidden ml-3 mr-3"><i
+                                    class="fas fa-save"></i></a>
+                            <a href="javascript:void(0);" title="Hủy bỏ"
+                                id='btnCancel'
+                                class="btn bg-gradient-warning btn-themmoi
+                                hidden">
+                                <i class="fas fa-window-close"></i></a>
+
+                        </div>
+
+                    </div>
+                    <div class="card-body p-0" style="width: auto; overflow-x:
+                        auto;">
+                        <table class="table table-bordered" id="idDataTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">STT</th>
+                                    <th>Tên</th>
+                                    <th>Ngày tạo</th>
+                                    <th style='min-width:240px!important;'>Chức
+                                        năng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+        </div>
+
+        <input type="text" id='idEventCategory' style='display: none;' />
+
+
+        <%- contentFor('loadScript') %>
+            <script src='/js/Setting/department.js?ver=132'></script>
+            <script src='/js/search.js?ver=132'></script>
+
+            <script>
+        $(document).ready(function () {
+            TaoDataTable("idDataTable", GetColumnsForDatatable(4)).then(() => {
+                SettingSearch();
+            });
+        });
+    </script>

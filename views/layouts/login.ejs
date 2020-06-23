@@ -1,0 +1,49 @@
+<%- contentFor('body') %>
+
+    <div class="wrapper">
+        <form class="form-signin">
+            <h2 class="form-signin-heading">Please login</h2>
+            <input type="text" class="form-control" id="username"
+                name="username" placeholder="Username" required="" autofocus="">
+            <input type="password" class="form-control" id="password"
+                name="password" placeholder="Password" required="">
+            <a class="btn btn-lg btn-primary btn-block" id="login" type="button"
+                onclick="Login()">Login</a>
+        </form>
+    </div>
+    <script
+        src="https://static.codepen.io/assets/editor/live/css_reload-5619dc0905a68b2e6298901de54f73cefe4e079f65a75406858d92924b4938bf.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).keypress(function (event) {
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if (keycode == '13') {
+                    Login();
+                }
+            });
+        });
+
+        function Login() {
+            let username = $('#username').val();
+            let password = $('#password').val();
+            console.log(username, password)
+            if(!username || !password ){
+                alert('Invalid data');
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/api/login',
+                data: { username, password },
+
+            }).done((data) => {
+                //alert(data);
+                document.location.href='/';
+            }).fail(err => {
+                alert(err.responseJSON.message);
+            })
+
+        }
+    </script>
+</html>

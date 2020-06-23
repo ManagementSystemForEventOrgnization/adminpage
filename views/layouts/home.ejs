@@ -1,0 +1,35 @@
+<%- contentFor('head') %>
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<script>
+  window.OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+      appId: "5ec87a01-7411-46c9-ade1-6315c42b7f7c",
+    });
+    console.log(OneSignal);
+  });
+  
+</script>
+
+<%- contentFor('body') %>
+    <div class="row">
+
+    </div>
+    <div class="row">
+        <div class="col-lg-12" style="margin: auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Trang chủ</h3>
+
+                </div>
+                <div class="card-body p-0" style="width: auto; overflow-x:
+                    auto;">
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+    </div>
+
+<%- contentFor('loadScript') %>
+<script src='/js/search.js?ver=132' async></script>

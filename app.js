@@ -22,5 +22,5 @@ require('./utils/passport_login')(app);
 //     })
 // })
 app.listen(process.env.PORT || 3000, () => {
-    console.log('http://localhost:3000');
+    console.log(`http://localhost:${process.env.PORT || 3000}`);
 })

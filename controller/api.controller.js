@@ -10,7 +10,6 @@ const Thu = mongoose.model('thus');
 const Chi = mongoose.model('chis');
 const Passport = require('passport');
 const { send_notification } = require('../utils/mainFunction');
-var bcrypt = require('bcrypt');
 
 const notification = require('../utils/notification')
 

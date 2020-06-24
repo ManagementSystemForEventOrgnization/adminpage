@@ -7,6 +7,7 @@ const Branch = mongoose.model('branches');
 const Department = mongoose.model('departments');
 const Account = mongoose.model('accounts')
 const Thu = mongoose.model('thus');
+const Notification = mongoose.model('notification');
 const Chi = mongoose.model('chis');
 const Passport = require('passport');
 const { send_notification } = require('../utils/mainFunction');
@@ -351,6 +352,22 @@ module.exports = {
                 let isDelete = await Event.findByIdAndUpdate({ _id: ObjectId(id) }, { $set: { "status": status } });
 
                 if (isDelete) {
+                    if (status != "cancel") {
+                        const newNotification = new Notification({
+                            sender: ObjectId('5ee5d9aff7a5a623d08718d5') ,
+                            receiver: [isDelete.userId],
+                            type: `EVENT_${status}}`,
+                            message: "",
+                            title: `Admin ${status} event ${isDelete.name}`,
+                            linkTo: {
+                                key: "EventDetail",
+                                _id: isDelete._id,
+                            },
+                            isRead: false,
+                            isDelete: false
+                        });
+                        await newNotification.save();
+                    }
                     res.status(200).json({ message: 'success' });
                 } else {
                     res.status(600).json({ message: 'Xay ra loi' })
@@ -540,14 +557,14 @@ module.exports = {
         console.log(content)
         // const response = await notification.get_all_user();
         // console.log(response.body);
-        let response  = await notification.create_notification(req.body.content) // edit_device(req.body.id);
+        let response = await notification.create_notification(req.body.content) // edit_device(req.body.id);
         res.status(200).json(response);
     },
 
-    edit_device : async (req,res,next)=>{
-        let {id, name} = req.body;
+    edit_device: async (req, res, next) => {
+        let { id, name } = req.body;
 
-        const response = await notification.edit_device(id,name);
+        const response = await notification.edit_device(id, name);
         res.status(200).json(response);
     }
 

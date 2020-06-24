@@ -11,11 +11,9 @@
                     <option value="">Lựa chọn ở đây</option>
                     <option value="DRAFT">DRAFT</option>
                     <option value="PENDING">WAITING</option>
-                    <option value="CANCEL">CANCEL</option>
-                    <option value="PUBLIC">PUBLIC</option>
                 </select>
             </div>
-            <div class="col-md-3 form-group">
+            <div class="col-md-3 form-group hidden">
                 <label class="margin-top">Loại</label>
                 <div class="funkyradio">
                     <div class="funkyradio-primary col-md-12" style="padding-left: 0px !important;">
@@ -24,12 +22,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 form-group">
+            <div class="col-md-3 form-group hidden">
                 <label class="margin-top">Ngày bắt đầu</label>
                 <input type="text" id="startDate" class="form-control col-sm-12 hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
 
             </div>
-            <div class="col-md-3 form-group">
+            <div class="col-md-3 form-group hidden">
                 <label class="margin-top">Ngày kết thúc</label>
                 <input type="text" id="endDate" class="form-control col-sm-12 hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
 
@@ -100,7 +98,7 @@
     </div>
 
 <%- contentFor('loadScript') %>
-    <script src='/js/event.js?ver=132'></script>
+    <script src='/js/approve_event.js?ver=132'></script>
     <script src='/js/search.js?ver=132' async></script>
    
     <script>

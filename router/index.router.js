@@ -11,7 +11,7 @@ router.get('/Department', indexController.Department);
 router.get('/event/category', indexController.eventCategory);
 router.get('/event/applyEvent/:id', indexController.listApplyEvent);
 router.get('/traTienKhach', indexController.traTienKhach);
-
+router.get('/approve_event', indexController.approve_event);
 router.get('/login', indexController.login);
 
 module.exports = router;

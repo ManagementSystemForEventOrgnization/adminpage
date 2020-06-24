@@ -3,6 +3,7 @@ const router = express.Router();
 const getDataTable = require('../controller/getDataTable');
 
 router.get('/event', getDataTable.getEvent);
+router.get('/approve_event', getDataTable.approve_event);
 router.get('/applyEvent', getDataTable.getApplyEvent)
 router.get('/user', getDataTable.users)
 router.get('/Account', getDataTable.Account)

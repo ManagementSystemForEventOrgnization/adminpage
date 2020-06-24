@@ -32,6 +32,19 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
+  approve_event: async(req,res,next)=>{
+    res.locals = {
+      title: 'approve_event',
+      message: 'This is a message',
+      Ten: 'sang',
+      mUserId: 'NULL',
+      Active: '.approve_event'
+    };
+
+    res.render('approve_event', {
+      // additional locals, a custom layout, or other options can be defined here
+    });
+  },
 
   user: async (req, res, next) => {
     res.locals = {

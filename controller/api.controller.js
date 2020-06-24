@@ -538,9 +538,9 @@ module.exports = {
     push_notification: async (req, res, next) => {
         let { content } = req.body;
         console.log(content)
-        const response = await notification.get_all_user();
+        // const response = await notification.get_all_user();
         // console.log(response.body);
-        // let response  = await notification.create_notification(req.body.content) // edit_device(req.body.id);
+        let response  = await notification.create_notification(req.body.content) // edit_device(req.body.id);
         res.status(200).json(response);
     },
 

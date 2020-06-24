@@ -150,6 +150,139 @@ module.exports = {
         })
     },
 
+    approve_event: async(req,res)=>{
+        let search = req.query.myCustomParams;
+        let { status, startDate, endDate, fee } = req.query.multiSearch;
+
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+        let query = { 'status': { $in: ['DRAFT', 'WAITING'] } };
+        if (status) {
+            query.status = status;
+        }
+        if (+fee) {
+            query.isSellTicket = true;
+            query["ticket.price"] = { $exists: true };
+        }
+        if (search != "") {
+            query.$text = { $search: search };
+        }
+        let time = [];
+        if (startDate) {
+            time.push({ createdAt: { $gte: new Date(startDate) } });
+        }
+        if (endDate) {
+            time.push({ createdAt: { $lte: new Date(endDate) } });
+        }
+
+        if (time[0]) {
+            query.$and = time;
+        }
+
+        let arrSort = ['_id', 'name', 'userId', 'category', '_id', 'createdAt', 'status', '_id', '_id', '_id'];
+
+        let conditionSort = {};
+        conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
+
+        Promise.all([
+            // Event.countDocuments({ status: { $nin: ['DELETE', 'CANCEL'] } }),
+            Event.aggregate([
+                { $match: { status: { $in: ['DRAFT', 'WAITING'] } } },
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            Event.aggregate([
+                { $match: query },
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            Event.aggregate([
+                { $match: query },
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userId"
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: "eventcategories",
+                        localField: "category",
+                        foreignField: "_id",
+                        as: "category"
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: "applyevents",
+                        localField: "_id",
+                        foreignField: "eventId",
+                        as: "join"
+                    }
+                },
+                {
+                    $project: {
+                        name: 1,
+                        category: 1,
+                        userId: 1,
+                        createdAt: 1,
+                        status: 1,
+                        'session': {
+                            $filter: {
+                                input: "$session",
+                                as: "item",
+                                cond: { $not: { $eq: ["$$item.isCancel", true] } }
+                            }
+                        },
+                        numberJoin: { $cond: { if: { $isArray: "$join" }, then: { $size: "$join" }, else: "0" } }
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+                { $skip: +PageNo },
+                { $limit: +pageSize },
+            ])
+
+        ]).then(([Count, CountFilter, arr]) => {
+
+            let result = {
+                "d": {
+                    "draw": draw,
+                    "recordsTotal": Count[0] && Count[0].passing_scores || 0,
+                    "recordsFiltered": CountFilter[0] && CountFilter[0].passing_scores || 0,
+                }
+            }
+            let arrDT = [];
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    s1: +index + 1 + +PageNo,
+                    s2: `<div class='nameEvent'>${value.name || 'Null'}</div>`,
+                    s3: value.userId[0] && value.userId[0].fullName || "No_Name",
+                    s4: value.category[0] && value.category[0].name || "Null",
+                    s5: `<div class="" > ${value.numberJoin || '0'}</div>`,
+                    s6: `<div class="moveClick" onclick='ShowSession("${value._id}")'> ${value.session.length || '0'}</div>`,
+                    s7: formatDate(value.createdAt),
+                    s8: value.status || 'PENDING',
+                    s9: `<a title='Xóa' href='javascript:void(0);' onclick='Change("${value._id}", "DELETE")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
+                    <a title='Public' class='btn btn-warning' href="javascript: void(0);" onclick='Change("${value._id}", "PUBLIC")' > <i class="fa fa-check-circle"></i> </a>`,
+                })
+            });
+            result.d.data = arrDT;
+            res.send(result);
+        }).catch(err => {
+            console.log(err);
+        })
+    },
+
     getApplyEvent: async (req, res) => {
         let idSession = req.query.idSession;
         let search = req.query.myCustomParams;

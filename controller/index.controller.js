@@ -208,5 +208,17 @@ module.exports = {
     };
     res.render('login', {
     })
+  },
+
+  thu: async (req, res, next) => {
+    res.locals = {
+      title: 'Thu',
+      message: 'This is a message',
+      Active: '.thu #products'
+    };
+    res.render('ThongKe/thu', {
+    })
   }
+
+
 };

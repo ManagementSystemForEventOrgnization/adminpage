@@ -13,5 +13,5 @@ router.get('/event/applyEvent/:id', indexController.listApplyEvent);
 router.get('/traTienKhach', indexController.traTienKhach);
 router.get('/approve_event', indexController.approve_event);
 router.get('/login', indexController.login);
-
+router.get('/thu', indexController.thu);
 module.exports = router;

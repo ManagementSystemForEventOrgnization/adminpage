@@ -6,6 +6,7 @@ const EventCategory = mongoose.model('eventCategory');
 const Branch = mongoose.model('branches');
 const Department = mongoose.model('departments');
 const Account = mongoose.model('accounts')
+const Payment = mongoose.model('payment')
 
 const ObjectId = mongoose.Types.ObjectId;
 const Base64 = require('../utils/Base64')
@@ -150,7 +151,7 @@ module.exports = {
         })
     },
 
-    approve_event: async(req,res)=>{
+    approve_event: async (req, res) => {
         let search = req.query.myCustomParams;
         let { status, startDate, endDate, fee } = req.query.multiSearch;
 
@@ -159,28 +160,15 @@ module.exports = {
         let orderDir = req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
-        let query = { 'status': { $in: ['DRAFT', 'WAITING'] } };
+        let query = { 'status': { $in: ['EDITED', 'WAITING'] } };
         if (status) {
             query.status = status;
         }
-        if (+fee) {
-            query.isSellTicket = true;
-            query["ticket.price"] = { $exists: true };
-        }
+        
         if (search != "") {
             query.$text = { $search: search };
         }
-        let time = [];
-        if (startDate) {
-            time.push({ createdAt: { $gte: new Date(startDate) } });
-        }
-        if (endDate) {
-            time.push({ createdAt: { $lte: new Date(endDate) } });
-        }
-
-        if (time[0]) {
-            query.$and = time;
-        }
+        
 
         let arrSort = ['_id', 'name', 'userId', 'category', '_id', 'createdAt', 'status', '_id', '_id', '_id'];
 
@@ -190,7 +178,7 @@ module.exports = {
         Promise.all([
             // Event.countDocuments({ status: { $nin: ['DELETE', 'CANCEL'] } }),
             Event.aggregate([
-                { $match: { status: { $in: ['DRAFT', 'WAITING'] } } },
+                { $match: { status: { $in: ['EDITED', 'WAITING'] } } },
                 {
                     $count: "passing_scores"
                 }
@@ -264,6 +252,7 @@ module.exports = {
             let arrDT = [];
             arr.forEach((value, index) => {
                 arrDT.push({
+                    
                     s1: +index + 1 + +PageNo,
                     s2: `<div class='nameEvent'>${value.name || 'Null'}</div>`,
                     s3: value.userId[0] && value.userId[0].fullName || "No_Name",
@@ -271,7 +260,7 @@ module.exports = {
                     s5: `<div class="" > ${value.numberJoin || '0'}</div>`,
                     s6: `<div class="moveClick" onclick='ShowSession("${value._id}")'> ${value.session.length || '0'}</div>`,
                     s7: formatDate(value.createdAt),
-                    s8: value.status || 'PENDING',
+                    s8: value.status || 'WAITING',
                     s9: `<a title='Xóa' href='javascript:void(0);' onclick='Change("${value._id}", "DELETE")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
                     <a title='Public' class='btn btn-warning' href="javascript: void(0);" onclick='Change("${value._id}", "PUBLIC")' > <i class="fa fa-check-circle"></i> </a>`,
                 })
@@ -818,5 +807,97 @@ module.exports = {
         })
     },
 
+    thu: async (req, res, next) => {
+        let search = req.query.myCustomParams;
+        let { status, startDate, endDate, fee } = req.query.multiSearch;
+
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+
+        let query = { status: 'PAID' };
+        Promise.all(
+            [
+                Payment.aggregate([
+                    { $match: query },
+                    {
+                        $lookup:
+                        {
+                            from: "users",
+                            localField: "sender",
+                            foreignField: "_id",
+                            as: "senders"
+                        }
+                    },
+                    {$unwind : "$senders"},
+                    {
+                        $lookup:
+                        {
+                            from: "users",
+                            localField: "receiver",
+                            foreignField: "_id",
+                            as: "receivers"
+                        }
+                    },
+                    {$unwind : "$receivers"},
+                    {
+                        $lookup:
+                        {
+                            from: "events",
+                            localField: "eventId",
+                            foreignField: "_id",
+                            as: "event"
+                        }
+                    },
+                    {$unwind : "$event"},
+                    {
+                        $lookup:
+                        {
+                            from: "cards",
+                            localField: "cardId",
+                            foreignField: "_id",
+                            as: "card"
+                        }
+                    },
+                    {$unwind : "$card"},
+                    { $skip: +PageNo },
+                    { $limit: +pageSize },
+                ]),
+                Payment.countDocuments(query),
+                Payment.countDocuments(query),
+            ]
+        ).then(([arr, Count1, Count2]) => {
+            let result = {
+                "d": {
+                    "draw": draw || 1,
+                    "recordsTotal": Count1,
+                    "recordsFiltered": Count2,
+                }
+            }
+            let arrDT = [];
+
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    s1: +index + 1 + +PageNo,
+                    s2: value.senders.fullName || 'Null',
+                    s3: value.receivers.fullName || "No_Name",
+                    s4: new Date(value.createdAt).toLocaleString() || "Null",
+                    s5: value.card.cardNumber || 'null',
+                    s6: value.payType,
+                    s7: value.amount,
+                    s8: value.event.name,
+                    s9: value.status,
+
+
+                    // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
+                    // <a title='Danh sách đăng kí' class='btn bg-primary' href="/event/applyEvent/${value._id}" > <i class="fas fa-align-justify"></i> </a>`,
+                })
+            });
+            result.d.data = arrDT;
+            res.send(result);
+        })
+    }
 
 }

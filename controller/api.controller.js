@@ -354,7 +354,7 @@ module.exports = {
                 if (isDelete) {
                     if (status != "cancel") {
                         const newNotification = new Notification({
-                            sender: ObjectId('5ee5d9aff7a5a623d08718d5') ,
+                            sender: '5ee5d9aff7a5a623d08718d5' ,
                             receiver: [isDelete.userId],
                             type: `EVENT_${status}}`,
                             message: "",

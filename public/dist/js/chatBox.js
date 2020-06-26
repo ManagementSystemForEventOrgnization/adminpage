@@ -249,7 +249,9 @@ socket.on("server-sent-user", function (data) {
 socket.on("newUserConnect", data => {
 
     let u = userActive.findIndex(uu => uu.id === data.id);
-
+    let numUserOnline = $('#numUserOnline').text();
+    numUserOnline++;
+    $('#numUserOnline').text(numUserOnline);
     if (u !== -1) {
         // user da co k can them vao maf chi can reset lai trang thi cua no neu can
 
@@ -271,6 +273,9 @@ socket.on('userSentMessage', data => {
 
 socket.on('user-leave', user => {
     const index = userActive.findIndex(u => u.id === user.id);
+    let numUserOnline = $('#numUserOnline').text();
+    numUserOnline--;
+    $('#numUserOnline').text(numUserOnline);
     if (index !== -1) {
         let u1 = userActive.splice(index, 1)[0];
         $('#label' + u1.id).remove();
@@ -319,6 +324,7 @@ function resetChatBox(arr) {
     while (list.hasChildNodes()) {
         list.removeChild(list.firstChild);
     }
+    $('#numUserOnline').text(arr.length);
     arr.map(v => {
         addNewUser(v);
     })

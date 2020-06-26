@@ -10,7 +10,8 @@ const Thu = mongoose.model('thus');
 const Notification = mongoose.model('notification');
 const Chi = mongoose.model('chis');
 const Passport = require('passport');
-const { send_notification } = require('../utils/mainFunction');
+const Axios = require('axios');
+const key = require('../config/key');
 
 const notification = require('../utils/notification');
 const { response } = require('express');
@@ -354,9 +355,9 @@ module.exports = {
                 if (isDelete) {
                     if (status != "cancel") {
                         const newNotification = new Notification({
-                            sender: '5ee5d9aff7a5a623d08718d5' ,
+                            sender: '5ee5d9aff7a5a623d08718d5',
                             receiver: [isDelete.userId],
-                            type: `EVENT_${status}}`,
+                            type: `EVENT_${status}`,
                             message: "",
                             title: `Admin ${status} event ${isDelete.name}`,
                             linkTo: {
@@ -462,6 +463,87 @@ module.exports = {
         }
         res.status(200).json({ result: c });
     },
+    require_edit_event: async (req, res, next) => {
+        let { id, isEdit: isE } = req.body;
+        if (!id) {
+            res.status(600).json({ message: 'Sự kiện không tồn tại' });
+            return;
+        }
+        try {
+            let e = await Event.findById(id);
+            if (!e) {
+                res.status(600).json({ message: 'Sự kiện không tồn tại' });
+                return;
+            }
+
+            if (!e.isRequire) {
+                res.status(600).json({ message: 'Event approved! You should check log' });
+                return;
+            }
+            if (!+isE) {
+                // nay là khoong xác nhận
+                e.isRequire = false;
+                e.save().then(d => {
+                    // noti
+                    const newNotification = new Notification({
+                        sender: '5ee5d9aff7a5a623d08718d5',
+                        receiver: [e.userId],
+                        type: `REJECT_EDIT`,
+                        message: "",
+                        title: `Admin reject edit`,
+                        linkTo: {
+                            key: "EventDetail",
+                            _id: e._id,
+                        },
+                        isRead: false,
+                        isDelete: false
+                    });
+                    newNotification.save();
+                    res.status(200).json({ result: true });
+                    return;
+                })
+            } else {
+
+                if (!e.isRequire) {
+                    res.status(600).json({ message: 'Event approved! You should check log' });
+                    return;
+                }
+                let isEdit = e.isEdit || '0';
+                if ((+isEdit - (+Date.now())) > 0) {
+                    e.isRequire = false;
+                    e.save();
+                    res.status(200).json({ result: true });
+                    return;
+                }
+                e.isEdit = (+Date.now()) + 86400000;
+                e.isRequire = false;
+                e.save().then(() => {
+                    // noti
+                    const newNotification = new Notification({
+                        sender: '5ee5d9aff7a5a623d08718d5',
+                        receiver: [e.userId],
+                        type: `APPROVE_EDIT`,
+                        message: "",
+                        title: `Admin approve edit`,
+                        linkTo: {
+                            key: "EventDetail",
+                            _id: e._id,
+                        },
+                        isRead: false,
+                        isDelete: false
+                    });
+                    newNotification.save();
+                    res.status(200).json({ result: true });
+                }).catch(e => {
+                    res.status(600).json({ message: 'Không thể cấp quyền' })
+                    return;
+                })
+            }
+        } catch (error) {
+            res.status(600).json({ message: 'Sự kiện không tồn tại' });
+            return;
+        }
+    },
 
     user_report: async (req, res, next) => {
         let { _id } = req.body;
@@ -521,9 +603,13 @@ module.exports = {
                 res.status(500).json({ message: 'Người dùng không còn trong sự kiện' });
                 return;
             }
-
+            let eventId = applyEvent.eventId;
+            sessionId = applyEvent.session.id;
             let object = { ...listSession[0] };
-
+            Axios.post(`${key.back_end_uri}/refundForCancelledUser`,
+                {
+                    eventId
+                })
 
             res.status(200).json({ result: listSession[0] });
         })

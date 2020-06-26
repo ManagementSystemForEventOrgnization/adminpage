@@ -1,5 +1,6 @@
+const id = location.pathname.split("/")[3];
 customParams = "";
-multiSearch = "";
+idSession = "";
 function GetColumnsForDatatable(count) {
     var shit = new Array();
     for (var i = 0; i < count; i++) {
@@ -8,12 +9,12 @@ function GetColumnsForDatatable(count) {
     return shit;
 }
 
-
 function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
-            {rowId: 's1',
+            {
+                rowId: 's1',
                 "order": [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",
@@ -45,13 +46,14 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                 "lengthMenu": [[5, 10, 25, 99999], [5, 10, 25, "All"]],
                 "ajax":
                 {
-                    "url": "/api/datatable/event_cancel",
+                    "url": `/api/datatable/apply_event_cancel/`,
                     "contentType": "application/json",
                     "type": "GET",
                     "dataType": "JSON",
                     "data": function (d) {
                         d.myCustomParams = customParams;
-                        d.multiSearch = multiSearch;// idCongViec;
+                        d.idEvent = id;// idCongViec;
+                        d.idSession = idSession;
                         return d;
                     },
                     "dataSrc": function (json) {
@@ -82,21 +84,19 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
 
 function search1() {
-    let status = $('#idTT').val();
-    let startDate = $('#startDate').val();
-    let endDate = $('#endDate').val();
-    let fee = $('#traPhi:checkbox:checked').length;
-    multiSearch = { status, startDate, endDate, fee };
+    idSession = $('#idSearch').val();
     table.ajax.reload();
 }
 
-function ShowSession(id) {
+function ShowSessionApply(id){
+    document.querySelector('.lds-default').classList.toggle('hidden');
     document.getElementById('lightOrderDetail').style.display = 'block';
     document.getElementById('fadeOrderDetail').style.display = 'block';
-    $.get(`/api/get_session_cancel/${id}`, (data, status) => {
-        let event = data.result;
-        let arr = event.session;
-        $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
+    $.get(`/api/get_session_apply/${id}?isCancel=1`, (data, status) => {
+        let event = data.result.event;
+        let arr = data.result.session;
+        console.log(arr);
+        $('#idTitlePopup').text(`DANH SÁCH THAM GIA SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
         arr.forEach((e, i) => {
@@ -107,16 +107,14 @@ function ShowSession(id) {
                         style="background-image:
                         url(&quot;${event.bannerUrl}&quot;);">
                         <div class="badge-live-event">
-                            ${'CANCEL'}
+                            ${event.status || 'Run'}
                         </div>
-                        <div class="badge-live-event1" onclick="RefundMoney('${event._id}', '${e.id}'})"> Refund money </div>
                         <a data-opm="0"
-                            href="${event.urlWeb}"
+                            href="${baseURLWeb}/${event.urlWeb}"
                             class="cover-img w-100 event-item-link"
                             data-event-id="79608"></a>
                     </div>
                     <div class="card-body relative">
-                    
                         <div class="padding-10">
                             <div class="table w-100 margin-bottom-0">
                                 <div class="table-cell event-title">
@@ -145,7 +143,6 @@ function ShowSession(id) {
                                             <a data-opm="0"
                                                 href="/events?Categories=8"
                                                 class="tag-kind">${event.category.name}</a>
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -173,45 +170,51 @@ function ShowSession(id) {
 
             $('#OrderDetail').append(template);
         });
-
+        document.querySelector('.lds-default').classList.toggle('hidden');
     })
 
 }
 
-function Delete(id, status = 'CANCEL') {
-    if (confirm(`Xác nhận ${status}!`)) {
+function Delete(id) {
+    // reject all session of user
+   
+    if (confirm("Xác nhận xóa!")) {
+        document.querySelector('.lds-default').classList.toggle('hidden');
         $.ajax({
             type: 'POST',
-            url: '/api/deleteEvent',
-            data: { id, status: 'CANCEL' },
-
+            url: '/api/event/reject_user',
+            data: { applyEventId: id },
         }).done((data) => {
-            if (data.message != 'success') {
-                console.log(data);
-                alert(`${data.message}`);
-            } else {
-                table.ajax.reload();
-            }
-        }).fail(err => {
-            alert(err.responseJSON.message);
-            console.log(err.responseJSON.message);
-        })
+            console.log(data);
+            appendAlert('Hủy thành công user');
+            document.getElementById('lightOrderDetail').style.display = 'none';
+            document.getElementById('fadeOrderDetail').style.display = 'none';
+            
+            document.querySelector('.lds-default').classList.toggle('hidden');
+            table.ajax.reload();
+        }).fail((err) => {
+            document.querySelector('.lds-default').classList.toggle('hidden');
+            appendAlert(err.responseJSON.message)
+        });
     }
 }
 
+function Print(id) {
+    //alert('Chưa xác định được mẫu in.');
 
-$(document).ready(function () {
+    $.get('../Ajax.aspx?Action=LoadIn&id=' + id, (data, status) => {
 
-    $('#startDate').datetimepicker({
-        lang: 'vi',
-        timepicker: false,
-        format: 'Y/m/d',
-        formatDate: 'Y/m/d',
+        var print = window.open('', '_blank');
+
+        var shtml = "<html>";
+        shtml += "<body onload=\"window.print(); window.close();\">";
+        shtml += data;
+
+        shtml += "</body>";
+        shtml += "</html>";
+
+        print.document.write(shtml);
+        print.document.close();
     });
-    $('#endDate').datetimepicker({
-        lang: 'vi',
-        timepicker: false,
-        format: 'Y/m/d',
-        formatDate: 'Y/m/d',
-    });
-});
+    // xu ly in ne;
+}

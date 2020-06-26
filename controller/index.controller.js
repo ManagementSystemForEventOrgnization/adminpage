@@ -45,7 +45,19 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
+  require_edit_event: async(req,res,next)=>{
+    res.locals = {
+      title: 'require_edit_event',
+      message: 'This is a message',
+      Ten: 'sang',
+      mUserId: 'NULL',
+      Active: '.require_edit_event'
+    };
 
+    res.render('require_edit', {
+      // additional locals, a custom layout, or other options can be defined here
+    });
+  },
   user: async (req, res, next) => {
     res.locals = {
       title: 'Event',
@@ -157,7 +169,6 @@ module.exports = {
     }
   },
 
-
   listApplyEventCancel: async (req, res, next) => {
     let id = req.params.id; // đây là id của event .
 
@@ -167,18 +178,7 @@ module.exports = {
     }
     // check xem id nay có trên db hay không.
     try {
-      let event = await ApplyEvent.aggregate([
-        { $match: { eventId: ObjectId(id), session } },
-        {
-          $lookup: {
-            from: 'payments',
-            localField: 'session.paymentId',
-            foreignField: '_id',
-            as: 'payment'
-          }
-        }
-      ]);
-
+      let event = await Event.findById(id);
 
       if (!event) {
         // thông báo ra là id nay không tồn tại.
@@ -190,7 +190,7 @@ module.exports = {
           mUserId: 'NULL',
           Active: '.tra_tien_khach #products'
         };
-        res.render('applyEvent', {
+        res.render('ThongKe/applyEventCancel', {
           event: event
           // additional locals, a custom layout, or other options can be defined here
         });
@@ -217,6 +217,16 @@ module.exports = {
       Active: '.thu #products'
     };
     res.render('ThongKe/thu', {
+    })
+  },
+
+  refund: async (req, res, next) => {
+    res.locals = {
+      title: 'Thu',
+      message: 'This is a message',
+      Active: '.refund #products'
+    };
+    res.render('ThongKe/refund', {
     })
   }
 

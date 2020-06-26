@@ -260,10 +260,10 @@
                 <!-- <div class="popup-head-right pull-right">
                     <button data-widget="remove" id="removeClass" class="chat-header-button pull-right " type="button"><i class="fas fa-times"></i></button>
                 </div> -->
-                <div  class="popup-head-right pull-right">35 online</div>
+                <div  class="popup-head-right pull-right" ><span id='numUserOnline'>0</span><span>online </span></div>
             </div>
             <!-- <hr/> -->
-            <div class="popup-messages" id='DanhSachUser' style="margin-bottom: 2px;"> 
+            <div class="popup-messages" id='DanhSachUser' style="margin-bottom: 2px; overflow: auto;"> 
             </div> 
             <div class="popup-messages-footer">
                 <input id="searchUser" style="height: 34px;" placeholder="Search.." rows="10" cols="5" name="message"></input> 
@@ -317,6 +317,12 @@
                             <span class="nav-label">Duyệt sự kiện</span>
                         </a> 
                     </li>
+                    <li > 
+                        <a href="/require_edit_event" class="require_edit_event"><i class="fa fa-diamond"></i> 
+                            <span class="nav-label">Duyệt edit</span>
+                        </a> 
+                    </li>
+                    
                     <li> 
                         <a href="/event/category" class="event_category"><i class="fa fa-calendar-alt"></i> 
                             <span class="nav-label">Loại sự kiện</span>
@@ -332,7 +338,7 @@
                         </a>
                         <ul class="sub-menu collapse" id="products">
                             <li class="thu"><a href="/thu">Thu</a></li>
-                            <li><a href="#">Refund</a></li>
+                            <li class="refund"><a href="/refund">Refund</a></li>
                             <li><a href="#">Chi</a></li>
                             <li><a href="#">Thống kê tuần</a></li>
                             <li class="tra_tien_khach"><a href="/traTienKhach">Hoàn tiền sự kiện hủy</a></li>

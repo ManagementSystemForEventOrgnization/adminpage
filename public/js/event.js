@@ -13,8 +13,10 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
-            {
-                "order": [[0, "desc"]],
+            { 
+                scrollY: 700,
+                scrollCollapse: true,
+                "order": false,// [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",
                     "sLengthMenu": "Xem _MENU_ mục",
@@ -32,7 +34,6 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                         "sLast": "Cuối"
                     }
                 },
-
                 "columnDefs": [
                     {
                         "targets": -1,
@@ -41,6 +42,7 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
                 ],
                 "processing": true,
+                rowId: '_id',
                 "serverSide": true,
                 "lengthMenu": [[5, 10, 25, 99999], [5, 10, 25, "All"]],
                 "ajax":
@@ -75,7 +77,8 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                 "drawCallback": function (settings) {
 
                 },
-                "deferRender": true
+                "deferRender": true,
+                responsive: true,
             });
     });
 }
@@ -205,6 +208,7 @@ function Delete(id, status = 'CANCEL') {
 
 
 $(document).ready(function () {
+    
     document.querySelector('.lds-default').classList.toggle('hidden');
     $('#startDate').datetimepicker({
         lang: 'vi',

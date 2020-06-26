@@ -29,6 +29,7 @@ router.post('/updateDepartment', apiController.updateDepartment);
 router.post('/deleteEvent', apiController.deleteEvent)
 router.post('/add_thu', apiController.add_thu);
 router.post('/user/report', apiController.user_report);
+router.post('/require_edit_event', apiController.require_edit_event);
 
 router.post('/event/reject_user', apiController.reject_event);
 router.post('/login',apiController.login);

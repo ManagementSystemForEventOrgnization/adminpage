@@ -11,7 +11,7 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
-            {
+            {rowId: 's1',
                 "order": [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",

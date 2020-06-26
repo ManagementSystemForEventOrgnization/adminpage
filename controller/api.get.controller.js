@@ -84,10 +84,22 @@ module.exports = {
 
     getSessionApply: async (req, res, next) => {
         let { id } = req.params;
+        let { isCancel } = req.query;
 
         if (!id) {
             return res.status(404).json({ message: 'Event not exists!' })
         }
+
+        let condition = { _id: ObjectId(id) };
+        let conditionFilter = {};
+        if (isCancel) {
+            condition.session = { $elemMatch: { isCancel: true, isRefund: false } }
+            conditionFilter = {$and : [{$eq: ['$$item.isCancel' , true]}, {$eq: ['$$item.isRefund', false]}]}
+        }else{
+            condition.session = { $elemMatch: { isCancel: false, isRefund: false } }
+            conditionFilter = { $not: { $eq: ["$$item.isCancel", true] } }
+        }
+
         let e = await ApplyEvent.aggregate([
             { $match: { _id: ObjectId(id) } },
             {
@@ -121,7 +133,7 @@ module.exports = {
                         $filter: {
                             input: "$session",
                             as: "item",
-                            cond: { $not: { $eq: ["$$item.isReject", true] } }
+                            cond: conditionFilter
                         }
                     }
                 }
@@ -166,7 +178,7 @@ module.exports = {
                 { $unwind: '$category' },
                 {
                     $project: {
-                        name: 1, isSellTicket: 1, ticket: 1, urlWeb: 1, userId: 1, createdAt: 1, category:1,
+                        name: 1, isSellTicket: 1, ticket: 1, urlWeb: 1, userId: 1, createdAt: 1, category: 1,
                         'session': {
                             $filter: {
                                 input: "$session",

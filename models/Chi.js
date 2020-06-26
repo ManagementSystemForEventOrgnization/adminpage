@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const chiSchema = new Schema({
     userChi: { type: mongoose.Types.ObjectId, ref: 'accounts' },
+    userId: {type : mongoose.Types.ObjectId, ref: 'users'},
     name: { type: String, "index": "text" },
     code: { type: String, default: `MPC:${Date.now}` },
     type: { type: String, default: 'OTHER' },

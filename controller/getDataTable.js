@@ -20,11 +20,11 @@ let { formatDate } = require('../utils/mainFunction');
 module.exports = {
     getEvent: async (req, res) => {
         let search = req.query.myCustomParams;
-        let { status, startDate, endDate, fee } = req.query.multiSearch;
+        let { status, startDate, endDate, fee } = req.query.multiSearch || {};
 
         let draw = req.query.draw;
-        let order = req.query.order[0].column;
-        let orderDir = req.query.order[0].dir;
+        let order = 0;// req.query.order[0].column;
+        let orderDir = 'decs' // req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
         let query = { 'status': { $nin: ['DELETE', 'CANCEL'] } };
@@ -93,8 +93,17 @@ module.exports = {
                     $lookup:
                     {
                         from: "applyevents",
-                        localField: "_id",
-                        foreignField: "eventId",
+                        let: { event_id: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    'session' : {$elemMatch : {isCancel : false}} ,
+                                    $expr: {
+                                        $and : [{$eq: ['$eventId', '$$event_id']}]
+                                    }
+                                }
+                            },
+                        ],
                         as: "join"
                     }
                 },
@@ -132,6 +141,7 @@ module.exports = {
             let arrDT = [];
             arr.forEach((value, index) => {
                 arrDT.push({
+                    _id: value._id,
                     s1: +index + 1 + +PageNo,
                     s2: `<div class='nameEvent'>${value.name || 'Null'}</div>`,
                     s3: value.userId[0] && value.userId[0].fullName || "No_Name",
@@ -164,11 +174,11 @@ module.exports = {
         if (status) {
             query.status = status;
         }
-        
+
         if (search != "") {
             query.$text = { $search: search };
         }
-        
+
 
         let arrSort = ['_id', 'name', 'userId', 'category', '_id', 'createdAt', 'status', '_id', '_id', '_id'];
 
@@ -252,7 +262,7 @@ module.exports = {
             let arrDT = [];
             arr.forEach((value, index) => {
                 arrDT.push({
-                    
+
                     s1: +index + 1 + +PageNo,
                     s2: `<div class='nameEvent'>${value.name || 'Null'}</div>`,
                     s3: value.userId[0] && value.userId[0].fullName || "No_Name",
@@ -271,7 +281,107 @@ module.exports = {
             console.log(err);
         })
     },
+    require_edit_event: async (req, res) => {
+        let search = req.query.myCustomParams;
+        let { status, startDate, endDate, fee } = req.query.multiSearch;
 
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+        let query = { isRequire: true };
+        if (status) {
+            query.status = status;
+        }
+
+        if (search != "") {
+            query.$text = { $search: search };
+        }
+
+
+        let arrSort = ['_id', 'name', 'userId', 'category', '_id', 'createdAt', 'status', '_id', '_id', '_id'];
+
+        let conditionSort = {};
+        conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
+
+        Promise.all([
+            // Event.countDocuments({ status: { $nin: ['DELETE', 'CANCEL'] } }),
+            Event.aggregate([
+                { $match: { isRequire: true }},
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            Event.aggregate([
+                { $match: query },
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            Event.aggregate([
+                { $match: query },
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userId"
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: "eventcategories",
+                        localField: "category",
+                        foreignField: "_id",
+                        as: "category"
+                    }
+                },
+                {
+                    $project: {
+                        name: 1,
+                        category: 1,
+                        userId: 1,
+                        createdAt: 1,
+                        status: 1,
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+                { $skip: +PageNo },
+                { $limit: +pageSize },
+            ])
+
+        ]).then(([Count, CountFilter, arr]) => {
+
+            let result = {
+                "d": {
+                    "draw": draw,
+                    "recordsTotal": Count[0] && Count[0].passing_scores || 0,
+                    "recordsFiltered": CountFilter[0] && CountFilter[0].passing_scores || 0,
+                }
+            }
+            let arrDT = [];
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    _id: value._id,
+                    s1: +index + 1 + +PageNo,
+                    s2: `<div class='nameEvent'>${value.name || 'Null'}</div>`,
+                    s3: value.userId[0] && value.userId[0].fullName || "No_Name",
+                    s4: value.category[0] && value.category[0].name || "Null",
+                    s5: formatDate(value.createdAt),
+                    s6: value.status || 'WAITING',
+                    s7: `<a title='Xóa' href='javascript:void(0);' onclick='Change("${value._id}", "0")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
+                    <a title='Public' class='btn btn-warning' href="javascript: void(0);" onclick='Change("${value._id}", "1")' > <i class="fa fa-check-circle"></i> </a>`,
+                })
+            });
+            result.d.data = arrDT;
+            res.send(result);
+        }).catch(err => {
+            console.log(err);
+        })
+    },
     getApplyEvent: async (req, res) => {
         let idSession = req.query.idSession;
         let search = req.query.myCustomParams;
@@ -303,14 +413,14 @@ module.exports = {
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
         let conditionMain = { 'eventId': ObjectId(idEvent) };
-        conditionMain.session = { $elemMatch: { status: 'JOINED', isReject: false } }
+        conditionMain.session = { $elemMatch: { isCancel: false } }
         if (idSession) {
             conditionMain.session.$elemMatch.id = idSession;// = { $elemMatch: { id: idSession, status: 'JOINED', isReject: false } }
         }
         Promise.all([
             ApplyEvent.countDocuments(conditionMain),
             ApplyEvent.aggregate([
-                { $match: { 'eventId': ObjectId(idEvent) } },
+                { $match: { 'eventId': ObjectId(idEvent), session: { $elemMatch: { isCancel: false } } } },
                 {
                     $lookup:
                     {
@@ -362,6 +472,7 @@ module.exports = {
                 { $limit: +pageSize },
             ])
         ]).then(([Count, CountFilter1, arr]) => {
+            console.log(CountFilter1, Count);
             let CountFilter = CountFilter1[0] ? (CountFilter1[0].passing_scores || 0) : 0;
             let result = {
                 "d": {
@@ -392,7 +503,130 @@ module.exports = {
 
         }).catch();
     },
+    apply_event_cancel: async (req, res) => {
+        let idSession = req.query.idSession;
+        let search = req.query.myCustomParams;
+        let idEvent = req.query.idEvent;
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+        console.log(idEvent)
+        let query = { 'eventId': ObjectId(idEvent) };
+        if (search != "") {
+            query.$text = { $search: search };
+        }
+        let conditionQuery = {
+            $expr: {
+                $and: [
+                    { $eq: ["$_id", "$$user_Id"] }
+                ],
+            },
+        };
+        if (search != "") {
+            conditionQuery.$text = { $search: search };
+        }
 
+        let arrSort = ['_id', 'users.fullName', 'users.email', 'users.gender', 'users.phone', 'createAt', 'qrcode', 'isConfirm', '_id', '_id'];
+
+        let conditionSort = {};
+        conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
+
+        let conditionMain = { 'eventId': ObjectId(idEvent) };
+        conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true } }
+        if (idSession) {
+            conditionMain.session.$elemMatch.id = idSession;// = { $elemMatch: { id: idSession, status: 'JOINED', isReject: false } }
+        }
+        Promise.all([
+            ApplyEvent.countDocuments(conditionMain),
+            ApplyEvent.aggregate([
+                { $match: { 'eventId': ObjectId(idEvent) } },
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        let: { user_Id: "$userId" },
+                        pipeline: [
+                            {
+                                $match: conditionQuery
+                            },
+                        ],
+                        as: "users"
+                    }
+                },
+                { $match: { 'users.fullName': { $exists: true } } },
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            ApplyEvent.aggregate([
+                { $match: conditionMain },
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        let: { user_Id: "$userId" },
+                        pipeline: [
+                            {
+                                $match: conditionQuery
+                            },
+                        ],
+                        as: "users"
+                    }
+                },
+                {
+                    $project: {
+                        users: 1, createdAt: 1, qrcode: 1,
+                        session: {
+                            $filter: {
+                                input: "$session",
+                                as: "item",
+                                cond: {
+                                    $and: [
+                                        { $eq: ["$$item.isCancel", true] },
+                                        { $eq: ["$$item.isRefund", false] }
+                                    ]
+                                } // { $not: { $eq: ["$$item.isReject", true] } }
+                            }
+                        }
+                    }
+                },
+                { $match: { 'users.fullName': { $exists: true }, } },
+                { $sort: conditionSort },
+                { $skip: +PageNo },
+                { $limit: +pageSize },
+            ])
+        ]).then(([Count, CountFilter1, arr]) => {
+            let CountFilter = CountFilter1[0] ? (CountFilter1[0].passing_scores || 0) : 0;
+            let result = {
+                "d": {
+                    "draw": draw,
+                    "recordsTotal": Count,
+                    "recordsFiltered": CountFilter,
+                }
+            }
+            let arrDT = [];
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    s1: +index + 1 + +PageNo,
+                    s2: value.users[0].fullName || '',
+                    s3: value.users[0].email || '',
+                    s4: value.users[0].gender || '',
+                    s5: value.users[0].phone || '0',
+                    s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || ''} </div>`,
+                    s7: formatDate(value.createdAt),
+                    s8: value.qrcode,
+                    s9: ('PENDING'),
+                    s10: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>`, // can them cac button vao.
+                })
+            });
+
+            result.d.data = arrDT;
+            res.send(result);
+
+        }).catch();
+    },
     users: async (req, res) => {
 
         let search = req.query.myCustomParams;
@@ -445,8 +679,8 @@ module.exports = {
                     s7: value.phone || '',
                     s8: formatDate(value.dateCreate) || 'NaN',
                     s9: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
-                    <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>        
-                    `, // can them cac button vao.
+                        <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>        
+                        `, // can them cac button vao.
                 })
             });
             result.d.data = arrDT;
@@ -581,8 +815,8 @@ module.exports = {
                     s2: value.name || '',
                     s3: formatDate(value.createAt),
                     s4: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
-                    <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}", "${n}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>
-                    `
+                        <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}", "${n}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>
+                        `
                 })
             });
 
@@ -631,8 +865,8 @@ module.exports = {
                     s2: value.name || '',
                     s3: formatDate(value.createAt),
                     s4: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
-                    <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}", "${n}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>
-                    `
+                        <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}", "${n}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>
+                        `
                 })
             });
 
@@ -681,8 +915,8 @@ module.exports = {
                     s2: value.name || '',
                     s3: formatDate(value.createAt),
                     s4: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
-                    <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}", "${n}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>
-                    `
+                        <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}", "${n}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>
+                        `
                 })
             });
 
@@ -705,9 +939,15 @@ module.exports = {
         let query = {
             $and: [
                 { isSellTicket: true },
-                { ticket: { $exists: true } },
+                { ticket: { $exists: true } }, //isRefund: { $ne: true }
                 { 'ticket.price': { $ne: 0 } },
-                { 'session.isCancel': true }
+                { 'session': { $elemMatch: { isCancel: true } } },
+                {
+                    $expr: {
+                        $ne: ['$session.refundNumber', '$session.joinNumber']
+
+                    }
+                }
             ]
         };
 
@@ -739,28 +979,22 @@ module.exports = {
                     {
                         $unwind: "$cate"
                     },
-                    {
-                        $lookup: {
-                            from: 'applyevents',
-                            localField: "_id",
-                            foreignField: "eventId",
-                            as: "arrApply"
-                        }
-                    },
-                    { $match: { arrApply: { $not: { $size: 0 } } } },
-                    {
-                        $lookup: {
-                            from: 'payments',
-                            localField: 'arrApply.session.paymentId',
-                            foreignField: '_id',
-                            as: 'payment'
-                        }
-                    },
+
+                    // { $match: { arrApply: { $not: { $size: 0 } } } },
+
+                    // {
+                    //     $lookup: {
+                    //         from: 'payments',
+                    //         localField: 'arrApply.session.paymentId',
+                    //         foreignField: '_id',
+                    //         as: 'payment'
+                    //     }
+                    // },
                     {
                         $project: {
                             name: 1, cate: 1, user: 1, createdAt: 1, status: 1,
-                            arrApply: 1,
-                            payment: 1,
+                            // arrApply: 1,
+                            // payment: 1,
                             'session': {
                                 $filter: {
                                     input: "$session",
@@ -821,6 +1055,14 @@ module.exports = {
         Promise.all(
             [
                 Payment.aggregate([
+                    {
+                        $group: {
+                            _id: null,
+                            sumTotal: { $sum: '$amount' }
+                        }
+                    }
+                ]),
+                Payment.aggregate([
                     { $match: query },
                     {
                         $lookup:
@@ -831,7 +1073,7 @@ module.exports = {
                             as: "senders"
                         }
                     },
-                    {$unwind : "$senders"},
+                    { $unwind: "$senders" },
                     {
                         $lookup:
                         {
@@ -841,7 +1083,7 @@ module.exports = {
                             as: "receivers"
                         }
                     },
-                    {$unwind : "$receivers"},
+                    { $unwind: "$receivers" },
                     {
                         $lookup:
                         {
@@ -851,7 +1093,7 @@ module.exports = {
                             as: "event"
                         }
                     },
-                    {$unwind : "$event"},
+                    { $unwind: "$event" },
                     {
                         $lookup:
                         {
@@ -861,19 +1103,20 @@ module.exports = {
                             as: "card"
                         }
                     },
-                    {$unwind : "$card"},
+                    { $unwind: "$card" },
                     { $skip: +PageNo },
                     { $limit: +pageSize },
                 ]),
                 Payment.countDocuments(query),
                 Payment.countDocuments(query),
             ]
-        ).then(([arr, Count1, Count2]) => {
+        ).then(([total, arr, Count1, Count2]) => {
             let result = {
                 "d": {
                     "draw": draw || 1,
                     "recordsTotal": Count1,
                     "recordsFiltered": Count2,
+                    sumTotal: total[0] && total[0].sumTotal || '0'
                 }
             }
             let arrDT = [];
@@ -886,9 +1129,149 @@ module.exports = {
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
                     s5: value.card.cardNumber || 'null',
                     s6: value.payType,
-                    s7: value.amount,
+                    s7: (value.amount + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
                     s8: value.event.name,
                     s9: value.status,
+
+
+                    // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
+                    // <a title='Danh sách đăng kí' class='btn bg-primary' href="/event/applyEvent/${value._id}" > <i class="fas fa-align-justify"></i> </a>`,
+                })
+            });
+            result.d.data = arrDT;
+            res.send(result);
+        })
+    },
+
+    refund: async (req, res, next) => {
+        let search = req.query.myCustomParams;
+        let { status, startDate, endDate, fee } = req.query.multiSearch;
+
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+
+        let query = { status: 'PAID' };
+        Promise.all(
+            [
+                Payment.aggregate([
+                    {
+                        $project: {
+                            amount: 1,
+                            status: 1,
+                            num: { $size: '$session' },
+                            num1: { $size: '$sessionRefunded' }
+                        }
+                    },
+                    {
+                        $match: {
+                            num1: { $ne: 0 },
+                            status: 'PAID'
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            sumTotal: { $sum: { $multiply: ['$amount', { $divide: ['$num1', '$num'] }] } }
+                        }
+                    }
+                ]),
+                Payment.aggregate([
+                    { $match: query },
+                    {
+                        $lookup:
+                        {
+                            from: "users",
+                            localField: "sender",
+                            foreignField: "_id",
+                            as: "senders"
+                        }
+                    },
+                    { $unwind: "$senders" },
+                    {
+                        $lookup:
+                        {
+                            from: "users",
+                            localField: "receiver",
+                            foreignField: "_id",
+                            as: "receivers"
+                        }
+                    },
+                    { $unwind: "$receivers" },
+                    {
+                        $lookup:
+                        {
+                            from: "events",
+                            localField: "eventId",
+                            foreignField: "_id",
+                            as: "event"
+                        }
+                    },
+                    { $unwind: "$event" },
+                    {
+                        $lookup:
+                        {
+                            from: "cards",
+                            localField: "cardId",
+                            foreignField: "_id",
+                            as: "card"
+                        }
+                    },
+                    { $unwind: "$card" },
+                    {
+                        $project: {
+                            status: 1,
+                            senders: 1, receivers: 1,
+                            card: 1,
+                            createdAt: 1,
+                            amount: 1,
+                            description: 1, event: 1,
+                            payType: 1,
+                            num: { $size: '$session' },
+                            num1: { $size: '$sessionRefunded' }
+                        }
+                    },
+                    {
+                        $match: {
+                            num1: { $ne: 0 }
+
+                            // $expr : {
+                            // //     $and: [
+                            //       $eq : ['$num1', '$num']
+                            //     //   ]  
+                            //   }
+                        }
+                    },
+                    { $skip: +PageNo },
+                    { $limit: +pageSize },
+                ]),
+                Payment.countDocuments(query),
+                Payment.countDocuments(query),
+            ]
+        ).then(([total, arr, Count1, Count2]) => {
+            let result = {
+                "d": {
+                    "draw": draw || 1,
+                    "recordsTotal": Count1,
+                    "recordsFiltered": Count2,
+                    sumTotal: total[0] && total[0].sumTotal || '0'
+                }
+            }
+            let arrDT = [];
+
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    s1: +index + 1 + +PageNo,
+                    s2: value.senders.fullName || 'Null',
+                    s3: value.receivers.fullName || "No_Name",
+                    s4: new Date(value.createdAt).toLocaleString() || "Null",
+                    s5: value.card.cardNumber || 'null',
+                    s6: value.payType || '',
+                    s7: ((((+value.amount || '0') / +value.num) * (+value.num1)) + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
+                    s8: value.event.name || '',
+                    s9: value.description || '',
 
 
                     // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>

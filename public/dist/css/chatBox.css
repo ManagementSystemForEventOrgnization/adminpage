@@ -91,7 +91,8 @@
 }
 .popup-box .popup-head .popup-head-left {
   margin: 11px 7px 0;
-  width: 264px !important;
+  width: 242px !important;
+  height: 45px;
   overflow: auto;
 }
 .popup-box .popup-messages {
@@ -430,4 +431,8 @@
   font-size: 15px;
   color: red;
   cursor: pointer;
+}
+#numUserOnline{
+  color: red;
+  margin-right: 12px;
 }

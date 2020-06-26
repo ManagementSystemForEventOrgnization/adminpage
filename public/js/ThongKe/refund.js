@@ -13,7 +13,7 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
-            {rowId: 's1',
+            {
                 "order": [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",
@@ -45,16 +45,19 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                 "lengthMenu": [[5, 10, 25, 99999], [5, 10, 25, "All"]],
                 "ajax":
                 {
-                    "url": "/api/datatable/event_cancel",
+                    "url": "/api/datatable/refund",
                     "contentType": "application/json",
                     "type": "GET",
                     "dataType": "JSON",
+                    rowId: 's1',
                     "data": function (d) {
                         d.myCustomParams = customParams;
                         d.multiSearch = multiSearch;// idCongViec;
                         return d;
                     },
                     "dataSrc": function (json) {
+                        console.log(json.d.sumTotal)
+                        document.getElementById('totalAmount').innerHTML = ((json.d.sumTotal+'').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."))
                         json.draw = json.d.draw;
                         json.recordsTotal = json.d.recordsTotal;
                         json.recordsFiltered = json.d.recordsFiltered;
@@ -91,11 +94,13 @@ function search1() {
 }
 
 function ShowSession(id) {
+    document.querySelector('.lds-default').classList.toggle('hidden');
     document.getElementById('lightOrderDetail').style.display = 'block';
     document.getElementById('fadeOrderDetail').style.display = 'block';
-    $.get(`/api/get_session_cancel/${id}`, (data, status) => {
+    $.get(`/api/get_session/${id}`, (data, status) => {
         let event = data.result;
         let arr = event.session;
+        console.log(arr);
         $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
@@ -107,16 +112,14 @@ function ShowSession(id) {
                         style="background-image:
                         url(&quot;${event.bannerUrl}&quot;);">
                         <div class="badge-live-event">
-                            ${'CANCEL'}
+                            ${event.status || 'Run'}
                         </div>
-                        <div class="badge-live-event1" onclick="RefundMoney('${event._id}', '${e.id}'})"> Refund money </div>
                         <a data-opm="0"
-                            href="${event.urlWeb}"
+                            href="${baseURLWeb}/${event.urlWeb}"
                             class="cover-img w-100 event-item-link"
                             data-event-id="79608"></a>
                     </div>
                     <div class="card-body relative">
-                    
                         <div class="padding-10">
                             <div class="table w-100 margin-bottom-0">
                                 <div class="table-cell event-title">
@@ -173,18 +176,19 @@ function ShowSession(id) {
 
             $('#OrderDetail').append(template);
         });
-
+        document.querySelector('.lds-default').classList.toggle('hidden');
     })
 
 }
 
-function Delete(id, status = 'CANCEL') {
+function Change(id, status) {
+
     if (confirm(`Xác nhận ${status}!`)) {
+        document.querySelector('.lds-default').classList.toggle('hidden');
         $.ajax({
             type: 'POST',
             url: '/api/deleteEvent',
-            data: { id, status: 'CANCEL' },
-
+            data: { id, status },
         }).done((data) => {
             if (data.message != 'success') {
                 console.log(data);
@@ -192,7 +196,9 @@ function Delete(id, status = 'CANCEL') {
             } else {
                 table.ajax.reload();
             }
+            document.querySelector('.lds-default').classList.toggle('hidden');
         }).fail(err => {
+            document.querySelector('.lds-default').classList.toggle('hidden');
             alert(err.responseJSON.message);
             console.log(err.responseJSON.message);
         })
@@ -201,7 +207,7 @@ function Delete(id, status = 'CANCEL') {
 
 
 $(document).ready(function () {
-
+    document.querySelector('.lds-default').classList.toggle('hidden');
     $('#startDate').datetimepicker({
         lang: 'vi',
         timepicker: false,
@@ -214,4 +220,5 @@ $(document).ready(function () {
         format: 'Y/m/d',
         formatDate: 'Y/m/d',
     });
+    document.querySelector('.lds-default').classList.toggle('hidden');
 });

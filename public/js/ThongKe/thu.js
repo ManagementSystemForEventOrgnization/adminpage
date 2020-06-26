@@ -14,6 +14,7 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
             {
+                rowId: 's1',
                 "order": [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",
@@ -55,6 +56,8 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                         return d;
                     },
                     "dataSrc": function (json) {
+                        document.getElementById('totalAmount').innerHTML = ((json.d.sumTotal+'').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."))
+
                         json.draw = json.d.draw;
                         json.recordsTotal = json.d.recordsTotal;
                         json.recordsFiltered = json.d.recordsFiltered;

@@ -99,8 +99,10 @@ function ShowSession(id) {
         $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
+        let length = arr.length -1;
+        console.log(length);
         arr.forEach((e, i) => {
-            let template = `<div class="col-sm-6 left padding-left-right-0-m">
+            let template = `<div class="col-sm-6 left padding-left-right-0-m" style='margin-left: ${((i==length)%2)==0?'0px':'25%'}'>
                 <div class="card">
                     <div class="card-cover relative lazyload-hot-event"
                         data-src="${event.bannerUrl}"

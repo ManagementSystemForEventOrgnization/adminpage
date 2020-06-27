@@ -97,9 +97,9 @@ module.exports = {
                         pipeline: [
                             {
                                 $match: {
-                                    'session' : {$elemMatch : {isCancel : false}} ,
+                                    'session': { $elemMatch: { isCancel: false } },
                                     $expr: {
-                                        $and : [{$eq: ['$eventId', '$$event_id']}]
+                                        $and: [{ $eq: ['$eventId', '$$event_id'] }]
                                     }
                                 }
                             },
@@ -308,7 +308,7 @@ module.exports = {
         Promise.all([
             // Event.countDocuments({ status: { $nin: ['DELETE', 'CANCEL'] } }),
             Event.aggregate([
-                { $match: { isRequire: true }},
+                { $match: { isRequire: true } },
                 {
                     $count: "passing_scores"
                 }
@@ -493,7 +493,7 @@ module.exports = {
                     s7: formatDate(value.createdAt),
                     s8: value.qrcode,
                     s9: ('PENDING'),
-                    s10: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>`, // can them cac button vao.
+                    s10: ``, // can them cac button vao.
                 })
             });
 
@@ -512,7 +512,6 @@ module.exports = {
         let orderDir = req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
-        console.log(idEvent)
         let query = { 'eventId': ObjectId(idEvent) };
         if (search != "") {
             query.$text = { $search: search };
@@ -534,14 +533,12 @@ module.exports = {
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
         let conditionMain = { 'eventId': ObjectId(idEvent) };
-        conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true } }
-        if (idSession) {
-            conditionMain.session.$elemMatch.id = idSession;// = { $elemMatch: { id: idSession, status: 'JOINED', isReject: false } }
-        }
+        conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true, paymentId: {$exists: true} } }
+        
         Promise.all([
             ApplyEvent.countDocuments(conditionMain),
             ApplyEvent.aggregate([
-                { $match: { 'eventId': ObjectId(idEvent) } },
+                { $match: conditionMain },
                 {
                     $lookup:
                     {
@@ -585,14 +582,15 @@ module.exports = {
                                 cond: {
                                     $and: [
                                         { $eq: ["$$item.isCancel", true] },
-                                        { $eq: ["$$item.isRefund", false] }
+                                        { $eq: ["$$item.isRefund", false] },
+                                        { $eq: [{$type : "$$item.paymentId"}, 'objectId'] }
                                     ]
                                 } // { $not: { $eq: ["$$item.isReject", true] } }
                             }
                         }
                     }
                 },
-                { $match: { 'users.fullName': { $exists: true }, } },
+                { $match: { 'users.fullName': { $exists: true }, 'session': {$elemMatch : {id : {$exists : true}}} } },
                 { $sort: conditionSort },
                 { $skip: +PageNo },
                 { $limit: +pageSize },
@@ -609,16 +607,17 @@ module.exports = {
             let arrDT = [];
             arr.forEach((value, index) => {
                 arrDT.push({
+                    _id: value._id,
                     s1: +index + 1 + +PageNo,
                     s2: value.users[0].fullName || '',
                     s3: value.users[0].email || '',
                     s4: value.users[0].gender || '',
                     s5: value.users[0].phone || '0',
-                    s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || ''} </div>`,
+                    s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || '0'} </div>`,
                     s7: formatDate(value.createdAt),
                     s8: value.qrcode,
-                    s9: ('PENDING'),
-                    s10: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>`, // can them cac button vao.
+                    s9: ('WAITING'),
+                    s10: `<a title='Refund' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-check"></i></a>`, // can them cac button vao.
                 })
             });
 
@@ -979,22 +978,9 @@ module.exports = {
                     {
                         $unwind: "$cate"
                     },
-
-                    // { $match: { arrApply: { $not: { $size: 0 } } } },
-
-                    // {
-                    //     $lookup: {
-                    //         from: 'payments',
-                    //         localField: 'arrApply.session.paymentId',
-                    //         foreignField: '_id',
-                    //         as: 'payment'
-                    //     }
-                    // },
                     {
                         $project: {
                             name: 1, cate: 1, user: 1, createdAt: 1, status: 1,
-                            // arrApply: 1,
-                            // payment: 1,
                             'session': {
                                 $filter: {
                                     input: "$session",

@@ -99,8 +99,9 @@ function ShowSessionApply(id){
         $('#idTitlePopup').text(`DANH SÁCH THAM GIA SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
+        let length = arr.length - 1;
         arr.forEach((e, i) => {
-            let template = `<div class="col-sm-6 left padding-left-right-0-m">
+            let template = `<div class="col-sm-6 left padding-left-right-0-m" style='margin-left: ${((i==length)%2)==0?'0px':'25%'}'>
                 <div class="card">
                     <div class="card-cover relative lazyload-hot-event"
                         data-src="${event.bannerUrl}"
@@ -186,7 +187,7 @@ function Delete(id) {
             data: { applyEventId: id },
         }).done((data) => {
             console.log(data);
-            appendAlert('Hủy thành công user');
+            appendAlert(data || 'Success',10000);
             document.getElementById('lightOrderDetail').style.display = 'none';
             document.getElementById('fadeOrderDetail').style.display = 'none';
             

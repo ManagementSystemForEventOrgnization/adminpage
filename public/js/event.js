@@ -14,8 +14,10 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
             { 
-                scrollY: 700,
-                scrollCollapse: true,
+                "sDom": 'T<"clear">lfrtip<"clear spacer">T',
+                "oTableTools": {
+                    "aButtons": [ "copy", "print" ]
+                },
                 "order": false,// [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",
@@ -78,7 +80,6 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
                 },
                 "deferRender": true,
-                responsive: true,
             });
     });
 }
@@ -90,7 +91,7 @@ function search1() {
     let endDate = $('#endDate').val();
     let fee = $('#traPhi:checkbox:checked').length;
     multiSearch = { status, startDate, endDate, fee };
-    table.ajax.reload();
+    table.ajax.reload(null,false);
 }
 
 function ShowSession(id) {
@@ -104,8 +105,9 @@ function ShowSession(id) {
         $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
+        let length = arr.length-1;
         arr.forEach((e, i) => {
-            let template = `<div class="col-sm-6 left padding-left-right-0-m">
+            let template = `<div class="col-sm-6 left padding-left-right-0-m" style='margin-left: ${((i==length)?((i+1)%2==0?'0px':'25%'):'0px')}'>
                 <div class="card">
                     <div class="card-cover relative lazyload-hot-event"
                         data-src="${event.bannerUrl}"
@@ -195,7 +197,7 @@ function Delete(id, status = 'CANCEL') {
                 console.log(data);
                 alert(`${data.message}`);
             } else {
-                table.ajax.reload();
+                table.ajax.reload(null,false);
             }
             document.querySelector('.lds-default').classList.toggle('hidden');
         }).fail(err => {
@@ -205,7 +207,6 @@ function Delete(id, status = 'CANCEL') {
         })
     }
 }
-
 
 $(document).ready(function () {
     

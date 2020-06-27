@@ -97,12 +97,12 @@ function ShowSession(id) {
     $.get(`/api/get_session/${id}`, (data, status) => {
         let event = data.result;
         let arr = event.session;
-        console.log(arr);
         $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
+        let length = arr.length-1;
         arr.forEach((e, i) => {
-            let template = `<div class="col-sm-6 left padding-left-right-0-m">
+            let template = `<div class="col-sm-6 left padding-left-right-0-m" style='margin-left: ${((i==length)?((i+1)%2==0?'0px':'25%'):'0px')}'>
                 <div class="card">
                     <div class="card-cover relative lazyload-hot-event"
                         data-src="${event.bannerUrl}"

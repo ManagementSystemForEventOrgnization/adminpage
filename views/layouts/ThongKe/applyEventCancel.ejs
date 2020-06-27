@@ -3,29 +3,14 @@
 
 <%- contentFor('body') %>
     <div class="row">
-        <div class="col-4" style="padding-bottom: 1rem">
-            <label class="margin-top">Session</label>
-            <select class="form-control" onchange="search1()" id="idSearch">
-                <option value=''>--Chọn session--</option>
-                <% for(let i= 0 ; i <event.session.length; i++){ %>
-                    <option value="<%=event.session[i].id %>"><%= new Date(event.session[i].day).toLocaleDateString()%></option>
-                <% } %>
-            </select>
-        </div>
-        <div class="col-8" style="padding-bottom: 1rem">
-            <a href="#" class="btn btn-primary
-                btn-themmoi" onclick="search1()"
-                style="position: absolute; top: 2rem;
-                display: block">
-                <i class="fas fa-search"></i></a>
-        </div>
+        
     </div>
     <div class="row">
         <div class="col-lg-12" style="margin: auto">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Danh sách người
-                        tham gia <%=event.name %></h3>
+                        tham gia <%=event.name %> chưa được refund</h3>
                         <!-- <a href="./ThemPhieuYeuCau.aspx" class="btn bg-gradient-success btn-themmoi"><i class="fas fa-plus"></i></a> -->
                     </div>
                     <div class="card-body p-0" style="width:

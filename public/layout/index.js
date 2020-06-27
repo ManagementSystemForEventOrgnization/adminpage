@@ -6,8 +6,8 @@ $(document).ready(function(){
  });
 
 
- function appendAlert(content){
-
+ function appendAlert(content, time){
+    time = time || 2000;
     let alert = $('div .alert').length;
 
     $('#Notification').append(`<div id='${(alert+1)}' class="alert alert-danger relative" role="alert">
@@ -17,5 +17,5 @@ $(document).ready(function(){
 
     setTimeout(() => {
         $(`#${alert+1}`).alert('close');
-    }, 2000);
+    }, time);
  }

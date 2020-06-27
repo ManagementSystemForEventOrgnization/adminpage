@@ -44,7 +44,6 @@
                                     <th>Thời gian đăng kí</th>
                                     <th>Mã QR</th>
                                     <th>Trạng thái</th>
-                                    <th>Chức năng</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,7 +87,7 @@
     <script src='/js/search.js?ver=132' async></script>
     <script>
         $(document).ready(function () {
-            TaoDataTable("idDataTable", GetColumnsForDatatable(10)).then(() => {
+            TaoDataTable("idDataTable", GetColumnsForDatatable(9)).then(() => {
                 SettingSearch();
             });
         });

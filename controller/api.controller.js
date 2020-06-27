@@ -350,12 +350,29 @@ module.exports = {
             res.status(600).json({ message: 'Thông tin không hợp lệ' });
         } else {
             try {
-                let isDelete = await Event.findByIdAndUpdate({ _id: ObjectId(id) }, { $set: { "status": status } });
+
+                let update = { $set: { 'session.$[elem].isCancel': true, 'session.$[elem].status': 'CANCEL' } };
+                let multi = {
+                    multi: true,
+                    arrayFilters: [{ "elem.isCancel": false, "elem.status": { $ne: 'CANCEL' } }]
+                };
+                let update1 = { $set: { 'session.$[elem].isCancel': true, 'session.$[elem].status': 'CANCEL', status: 'CANCEL' } };
+                let multi1 = {
+                    multi: true,
+                    arrayFilters: [{ "elem.isCancel": { $ne: true }, "elem.status": { $ne: 'CANCEL' } }]
+                };
+                if (status != "CANCEL") {
+                    console.log(1);
+                    update1 = { $set: { "status": status } };
+                    multi1 = { multi: false };
+                }
+                console.log(update1);
+                let isDelete = await Event.findByIdAndUpdate({ _id: ObjectId(id) }, update1, multi1);
 
                 if (isDelete) {
-                    if (status != "cancel") {
+                    if (status != "CANCEL") {
                         const newNotification = new Notification({
-                            sender: '5ee5d9aff7a5a623d08718d5',
+                            sender: key.adminId,
                             receiver: [isDelete.userId],
                             type: `EVENT_${status}`,
                             message: "",
@@ -368,6 +385,8 @@ module.exports = {
                             isDelete: false
                         });
                         await newNotification.save();
+                    } else {
+                        await ApplyEvent.updateMany({ eventId: ObjectId(id) }, update, multi);
                     }
                     res.status(200).json({ message: 'success' });
                 } else {
@@ -486,7 +505,7 @@ module.exports = {
                 e.save().then(d => {
                     // noti
                     const newNotification = new Notification({
-                        sender: '5ee5d9aff7a5a623d08718d5',
+                        sender: key.adminId,
                         receiver: [e.userId],
                         type: `REJECT_EDIT`,
                         message: "",
@@ -520,7 +539,7 @@ module.exports = {
                 e.save().then(() => {
                     // noti
                     const newNotification = new Notification({
-                        sender: '5ee5d9aff7a5a623d08718d5',
+                        sender: key.adminId,
                         receiver: [e.userId],
                         type: `APPROVE_EDIT`,
                         message: "",
@@ -578,11 +597,11 @@ module.exports = {
             multi.arrayFilters = [{ "elem.isReject": false, "elem.id": { $in: sessionId } }];
         } else {
             conditionFilter = { $eq: ["$$item.isReject", false] };
-            condition.session = { $elemMatch: { isReject: false } }
+            condition.session = { $elemMatch: { isReject: false } };
             multi.arrayFilters = [{ "elem.isReject": false }];
         }
         Promise.all([
-            ApplyEvent.findOneAndUpdate(condition, update, multi),
+            // ApplyEvent.findOneAndUpdate(condition, update, multi),
             ApplyEvent.aggregate([
                 { $match: condition },
                 {
@@ -598,23 +617,50 @@ module.exports = {
                     }
                 }
             ])
-        ]).then(([applyEvent, listSession]) => {
-            if (!applyEvent) {
+        ]).then(([listSession]) => {
+            if (!listSession[0]) {
                 res.status(500).json({ message: 'Người dùng không còn trong sự kiện' });
                 return;
             }
-            let eventId = applyEvent.eventId;
-            sessionId = applyEvent.session.id;
             let object = { ...listSession[0] };
-            Axios.post(`${key.back_end_uri}/refundForCancelledUser`,
-                {
-                    eventId
-                })
+            let eventId = object.eventId;
+            let joinUserId = object.userId;
+            let session = object.session;
+            let status = '';
+            let length = session.length;
+            let func = (eventId, sessionId, joinUserId, paymentId, i, callBack) => {
+                Axios.post(`${key.back_end_uri}/refundForCancelledUser`,
+                    {
+                        paymentId,
+                        joinUserId,
+                        eventId,
+                        sessionId,
+                        adminId: key.adminId
+                    }).then(d => {
+                        callBack(true, i)
+                    }).catch(e => {
+                        callBack(false, i)
+                    });
+            }
+            let callBack = (d, i) => {
+                if (!d) {
+                    status += i + ", ";
+                }
+                if (i == length - 1) {
+                    console.log(status);
+                    res.status(200).json(status);
+                    return;
+                }
+            }
 
-            res.status(200).json({ result: listSession[0] });
+            for (let i = 0; i < session.length; i++) {
+                let element = session[i];
+                let sessionId = element.id;
+                let paymentId = element.paymentId;
+                if (paymentId)
+                    func(eventId, sessionId, joinUserId, paymentId, i, callBack)
+            }
         })
-
-
     },
 
 

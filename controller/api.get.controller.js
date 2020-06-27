@@ -20,18 +20,6 @@ module.exports = {
         if (!id) {
             return res.status(404).json({ message: 'Event not exists!' })
         }
-
-        // let e = await Event.findById(id,
-        //     {
-        //         session:
-        //             { $elemMatch: { $or: [{ isCancel: false }, { isCancel: { $exists: false } }] } },
-        //         name: 1, category: 1, userId: 1, createdAt: 1, status: 1,
-        //         isSellTicket: 1,
-        //         ticket: 1,
-        //         bannerUrl: 1,
-        //         urlWeb: 1
-        //     }).populate("category").populate("userId")
-
         let e = await Event.aggregate([
             { $match: { _id: ObjectId(id) } },
             {
@@ -97,7 +85,7 @@ module.exports = {
             conditionFilter = {$and : [{$eq: ['$$item.isCancel' , true]}, {$eq: ['$$item.isRefund', false]}]}
         }else{
             condition.session = { $elemMatch: { isCancel: false, isRefund: false } }
-            conditionFilter = { $not: { $eq: ["$$item.isCancel", true] } }
+            conditionFilter = { $and : [{$not: { $eq: ["$$item.isCancel", true] }}, {$ne: ["$$item.isReject", true] }]}
         }
 
         let e = await ApplyEvent.aggregate([

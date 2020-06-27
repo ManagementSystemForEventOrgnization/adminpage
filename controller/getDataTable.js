@@ -97,7 +97,7 @@ module.exports = {
                         pipeline: [
                             {
                                 $match: {
-                                    'session': { $elemMatch: { isCancel: false } },
+                                    'session': { $elemMatch: { isCancel: false , isReject: false } },
                                     $expr: {
                                         $and: [{ $eq: ['$eventId', '$$event_id'] }]
                                     }
@@ -466,7 +466,7 @@ module.exports = {
                         }
                     }
                 },
-                { $match: { 'users.fullName': { $exists: true }, } },
+                { $match: { 'users.fullName': { $exists: true }, session: { $elemMatch: { id: { $exists: true } } } } },
                 { $sort: conditionSort },
                 { $skip: +PageNo },
                 { $limit: +pageSize },
@@ -489,7 +489,7 @@ module.exports = {
                     s3: value.users[0].email || '',
                     s4: value.users[0].gender || '',
                     s5: value.users[0].phone || '0',
-                    s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || ''} </div>`,
+                    s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || '0'} </div>`,
                     s7: formatDate(value.createdAt),
                     s8: value.qrcode,
                     s9: ('PENDING'),
@@ -533,8 +533,8 @@ module.exports = {
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
         let conditionMain = { 'eventId': ObjectId(idEvent) };
-        conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true, paymentId: {$exists: true} } }
-        
+        conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true, paymentId: { $exists: true } } }
+
         Promise.all([
             ApplyEvent.countDocuments(conditionMain),
             ApplyEvent.aggregate([
@@ -583,14 +583,14 @@ module.exports = {
                                     $and: [
                                         { $eq: ["$$item.isCancel", true] },
                                         { $eq: ["$$item.isRefund", false] },
-                                        { $eq: [{$type : "$$item.paymentId"}, 'objectId'] }
+                                        { $eq: [{ $type: "$$item.paymentId" }, 'objectId'] }
                                     ]
                                 } // { $not: { $eq: ["$$item.isReject", true] } }
                             }
                         }
                     }
                 },
-                { $match: { 'users.fullName': { $exists: true }, 'session': {$elemMatch : {id : {$exists : true}}} } },
+                { $match: { 'users.fullName': { $exists: true }, 'session': { $elemMatch: { id: { $exists: true } } } } },
                 { $sort: conditionSort },
                 { $skip: +PageNo },
                 { $limit: +pageSize },

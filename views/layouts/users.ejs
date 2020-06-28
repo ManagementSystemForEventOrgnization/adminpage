@@ -21,6 +21,46 @@
         cursor: pointer;
         background-color: #c8cada;
     }
+
+    .wrap {
+    flex: 1;
+    margin: auto;
+    margin-bottom: 5px;
+    border: 1px solid #36304a;
+    border-radius: 5px;
+    overflow: hidden;
+    }
+
+    .container {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    }
+
+    .text-nowrap {
+    white-space: nowrap;
+    }
+
+    table tr td {
+    padding: 10px 20px;
+    background: white;
+    }
+
+    table tr th {
+    padding: 20px;
+    /* color: white; */
+    background: white;
+    white-space: nowrap;
+    text-align: center;
+    }
+
+    table tr td:nth-child(2),
+    table tr th:nth-child(2) {
+    min-width: 100px;
+    position: sticky;
+    left: 0;
+    z-index: 9;
+    }
 </style>
 <%- contentFor('body') %>
     <div class="row">
@@ -37,9 +77,12 @@
         <div class="col-md-3 form-group">
             <label class="margin-top">Reported</label>
             <div class="funkyradio">
-                <div class="funkyradio-primary col-md-12" style="padding-left: 0px !important;">
-                    <input type="checkbox" name="reported" value="true" id="idReported" />
-                    <label style="height: calc(2.25rem + 2px)!important;" for="idReported">Bị report</label>
+                <div class="funkyradio-primary col-md-12" style="padding-left:
+                    0px !important;">
+                    <input type="checkbox" name="reported" value="true"
+                        id="idReported" />
+                    <label style="height: calc(2.25rem + 2px)!important;"
+                        for="idReported">Bị report</label>
                 </div>
             </div>
         </div>
@@ -52,32 +95,39 @@
     <div class="row">
         <div class="col-lg-12" style="margin: auto">
             <div class="card">
-                <div class="card-header" >
-                    <h3 class="card-title" style="display:inline-block">Danh sách users</h3>
-                    <a href="javascript:void(0);" id='btnAdd' style="float: right;" class="btn
+                <div class="card-header">
+                    <h3 class="card-title" style="display:inline-block">Danh
+                        sách users</h3>
+                    <a href="javascript:void(0);" id='btnAdd' style="float:
+                        right;" class="btn
                         btn-primary btn-themmoi"><i class="fas
                             fa-plus"></i></a>
                 </div>
-                <div class="card-body p-0" style="width: auto; overflow-x:
-                    auto;">
-                    <table class="table table-bordered" id="idDataTable">
-                        <thead>
-                            <tr>
-                                <th style="width: 10px">STT</th>
-                                <th>Tên</th>
-                                <th>Ảnh</th>
-                                <th>Email</th>
-                                <th>Giới tính</th>
-                                <th>Năm sinh</th>
-                                <th>SĐT</th>
-                                <th>Ngày tạo</th>
-                                <th>Chức năng</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div class="card-body p-0" style="width: auto; overflow-x:auto;">
+                    <div class="wrap">
+                        <div class="container">
+                            <table class="table table-bordered"
+                                id="idDataTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px">STT</th>
+                                        <th style='min-width: 150px!important;'>Tên</th>
+                                        <th>Ảnh</th>
+                                        <th>Email</th>
+                                        <th>Giới tính</th>
+                                        <th>Năm sinh</th>
+                                        <th>SĐT</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Chức năng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                        </tbody>
-                    </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -136,14 +186,17 @@
     <div id="lightOrderDetail1" class="white_content" style="width: 70%;
         left: 15%; height: auto;">
         <div class="box">
-            <div title='Close' class='closePopup' onclick="document.getElementById('lightOrderDetail1').style.display=
-        'none'; document.getElementById('fadeOrderDetail1').style.display=
-        'none'; $('#idBodyReport tr').remove();">X</div>
-        <div title='Banned' id='idBanned' class="confirmBanned"> <i class="fas fa-check"></i> </div>
+            <div title='Close' class='closePopup'
+                onclick="document.getElementById('lightOrderDetail1').style.display=
+                'none';
+                document.getElementById('fadeOrderDetail1').style.display=
+                'none'; $('#idBodyReport tr').remove();">X</div>
+            <div title='Banned' id='idBanned' class="confirmBanned"> <i
+                    class="fas fa-check"></i> </div>
             <div class="box-body">
                 <div class="titlePouple" style="text-align: center;
                     font-size: 2rem;" id="idTitlePopup1">Thêm thông tin
-                       
+
                 </div>
                 <div id="OrderDetail1" style="padding: 10px; text-align:
                     center">

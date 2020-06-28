@@ -1,6 +1,50 @@
 <link rel="stylesheet" href="/dist/css/event.css" />
 <link rel="stylesheet" href="/dist/css/popup.css">
+<style>
+    .nameEvent{
+    height: 70px !important;
+    overflow: auto;
+  }
+    .wrap {
+    flex: 1;
+    margin: auto;
+    margin-bottom: 5px;
+    border: 1px solid #36304a;
+    border-radius: 5px;
+    overflow: hidden;
+    }
 
+    .container {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    }
+
+    .text-nowrap {
+    white-space: nowrap;
+    }
+
+    table tr td {
+    padding: 10px 20px;
+    background: white;
+    }
+
+    table tr th {
+    padding: 20px;
+    /* color: white; */
+    background: white;
+    white-space: nowrap;
+    text-align: center;
+    }
+
+    table tr td:nth-child(2),
+    table tr th:nth-child(2) {
+    min-width: 100px;
+    position: sticky;
+    left: 0;
+    z-index: 9;
+    }
+</style>
 <%- contentFor('body') %>
     <div class="row">
         

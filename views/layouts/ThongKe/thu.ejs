@@ -1,7 +1,7 @@
 
- <link rel="stylesheet" href="/dist/css/event.css" />
- <link rel="stylesheet" href="/dist/css/popup.css">
- <style>
+<link rel="stylesheet" href="/dist/css/event.css" />
+<link rel="stylesheet" href="/dist/css/popup.css">
+<style>
     .totalAmount{
         float: right;
         padding-top: 30px;
@@ -9,111 +9,180 @@
         font-size: 40px;
         color: red;
     }
+    .nameEvent{
+    height: 70px !important;
+    overflow: auto;
+  }
+    .wrap {
+    flex: 1;
+    margin: auto;
+    margin-bottom: 5px;
+    border: 1px solid #36304a;
+    border-radius: 5px;
+    overflow: hidden;
+    }
+
+    .container {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    }
+
+    .text-nowrap {
+    white-space: nowrap;
+    }
+
+    table tr td {
+    padding: 10px 20px;
+    background: white;
+    }
+
+    table tr th {
+    padding: 20px;
+    /* color: white; */
+    background: white;
+    white-space: nowrap;
+    text-align: center;
+    }
+
+    table tr td:nth-child(2),
+    table tr th:nth-child(2) {
+    min-width: 100px;
+    position: sticky;
+    left: 0;
+    z-index: 9;
+    }
+    
+    table tr td:nth-child(3),
+    table tr th:nth-child(3) {
+    position: sticky;
+    left: 200px;
+    z-index: 9;
+    }
 </style>
- <%- contentFor('body') %>
-     <div class="row" >
-         <div class="col-10 row" style="padding-bottom: 1rem">
-             <div class="col-md-3 form-group">
-                 <label class="margin-top">Trạng thái</label>
-                 <select class="form-control" onchange="search1()" id="idTT">
-                     <option value="">Lựa chọn ở đây</option>
-                     <option value="DRAFT">DRAFT</option>
-                     <option value="PENDING">WAITING</option>
-                 </select>
-             </div>
-             <div class="col-md-3 form-group hidden">
-                 <label class="margin-top">Loại</label>
-                 <div class="funkyradio">
-                     <div class="funkyradio-primary col-md-12" style="padding-left: 0px !important;">
-                         <input type="checkbox" name="traGop" value="true" id="traPhi" />
-                         <label style="height: calc(2.25rem + 2px)!important;" for="traPhi">Trả phí</label>
-                     </div>
-                 </div>
-             </div>
-             <div class="col-md-3 form-group hidden">
-                 <label class="margin-top">Ngày bắt đầu</label>
-                 <input type="text" id="startDate" class="form-control col-sm-12 hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
- 
-             </div>
-             <div class="col-md-3 form-group hidden">
-                 <label class="margin-top">Ngày kết thúc</label>
-                 <input type="text" id="endDate" class="form-control col-sm-12 hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
- 
-             </div>
-         </div>
-         <div class="col-2" style="padding-bottom: 1rem">
-             <a href="javascript: void(0);" class="btn btn-primary btn-themmoi"
-                 onclick="search1()" style="position: absolute; top: 2rem;
-                 display: block"><i class="fas fa-search"></i></a> 
-         </div>
-     </div>
-     <div class="col-md-12">
-         <!-- <div class="col-12" style="margin: auto"> -->
-             <div class="card">
-                 <div class="card-header">
-                     <a class="card-title">Thống kê thu tiền từ người dùng</a>
-                 </div>
-                 <div class="card-body p-0" style="width: auto; overflow:
-                     auto;">
-                     <table class="table table-bordered" id="idDataTable">
-                         <thead>
-                             <tr>
-                                 <th style="width: 50px">STT</th>
-                                 <th style="min-width: 200px!important;">Người gữi</th>
-                                 <th style="min-width: 200px!important;">Người nhận</th>
-                                 <th style="min-width: 200px!important;">Ngày gữi</th>
-                                 <th style="min-width: 100px!important;">Card number</th>
-                                 <th style="min-width: 150px!important;">payType</th>
-                                 <th style="min-width: 110px!important;">Số tiền</th>
-                                 <th style="min-width: 110px!important;">Tên sự kiện</th>
-                                 <th style="min-width: 120px!important;">Trạng thái</th>
-                             </tr>
-                         </thead>
-                         <tbody>
- 
-                         </tbody>
-                     </table>
-                 </div>
-                 <!-- /.card-body -->
-                 <div><div class="totalAmount"><label>Tổng tiền: </label> <span id='totalAmount'></span> <span>đ</span></div></div>
-             </div>
-         <!-- </div> -->
-     </div>
- 
-     <div id="lightOrderDetail" class="white_content" style="width: 80%;
-     left: 10%; top: 10%!important; height: 80vh; overflow-y: scroll;">
-     <div class="box" style="position: relative;">
-         <div style="position: absolute; top: 3px; right: 3px; font-size: 37px; color: red; cursor: pointer;" onclick="document.getElementById('lightOrderDetail').style.display=
-         'none'; document.getElementById('fadeOrderDetail').style.display=
-         'none'; $('#OrderDetail').text('');">X</div>
-         <div class="box-body">
-             <div class="titlePouple" style="text-align: center;
-                 font-size: 2rem; width: 100%; height: auto!important;overflow-x: scroll;" id="idTitlePopup">Thêm thông tin</div>
-             <div id="OrderDetail" style="padding: 10px; text-align:
-                 center">
- 
-                 <!-- <div class="box-footer" style="margin-top: 2rem;">
+<%- contentFor('body') %>
+    <div class="row">
+        <div class="col-10 row" style="padding-bottom: 1rem">
+            <div class="col-md-3 form-group">
+                <label class="margin-top">Trạng thái</label>
+                <select class="form-control" onchange="search1()" id="idTT">
+                    <option value="">Lựa chọn ở đây</option>
+                    <option value="DRAFT">DRAFT</option>
+                    <option value="PENDING">WAITING</option>
+                </select>
+            </div>
+            <div class="col-md-3 form-group hidden">
+                <label class="margin-top">Loại</label>
+                <div class="funkyradio">
+                    <div class="funkyradio-primary col-md-12"
+                        style="padding-left: 0px !important;">
+                        <input type="checkbox" name="traGop" value="true"
+                            id="traPhi" />
+                        <label style="height: calc(2.25rem + 2px)!important;"
+                            for="traPhi">Trả phí</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 form-group hidden">
+                <label class="margin-top">Ngày bắt đầu</label>
+                <input type="text" id="startDate" class="form-control col-sm-12
+                    hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
+            </div>
+            <div class="col-md-3 form-group hidden">
+                <label class="margin-top">Ngày kết thúc</label>
+                <input type="text" id="endDate" class="form-control col-sm-12
+                    hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
+            </div>
+        </div>
+        <div class="col-2" style="padding-bottom: 1rem">
+            <a href="javascript: void(0);" class="btn btn-primary btn-themmoi"
+                onclick="search1()" style="position: absolute; top: 2rem;
+                display: block"><i class="fas fa-search"></i></a>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <!-- <div class="col-12" style="margin: auto"> -->
+        <div class="card">
+            <div class="card-header">
+                <a class="card-title">Thống kê thu tiền từ người dùng</a>
+            </div>
+            <div class="card-body p-0" style="width: auto; overflow:
+                auto;"><div class="wrap">
+                    <div class="container">
+                        <table class="table table-bordered" id="idDataTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px">STT</th>
+                                    <th style="min-width: 200px!important;">Người
+                                        gữi</th>
+                                    <th style="min-width: 200px!important;">Người
+                                        nhận</th>
+                                    <th style="min-width: 200px!important;">Ngày
+                                        gữi</th>
+                                    <th style="min-width: 100px!important;">Card
+                                        number</th>
+                                    <th style="min-width: 150px!important;">payType</th>
+                                    <th style="min-width: 110px!important;">Số
+                                        tiền</th>
+                                    <th style="min-width: 110px!important;">Tên
+                                        sự kiện</th>
+                                    <th style="min-width: 120px!important;">Trạng
+                                        thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.card-body -->
+            <div><div class="totalAmount"><label>Tổng tiền: </label> <span
+                        id='totalAmount'></span> <span>đ</span></div></div>
+        </div>
+        <!-- </div> -->
+    </div>
+
+    <div id="lightOrderDetail" class="white_content" style="width: 80%;
+        left: 10%; top: 10%!important; height: 80vh; overflow-y: scroll;">
+        <div class="box" style="position: relative;">
+            <div style="position: absolute; top: 3px; right: 3px; font-size:
+                37px; color: red; cursor: pointer;"
+                onclick="document.getElementById('lightOrderDetail').style.display=
+                'none';
+                document.getElementById('fadeOrderDetail').style.display=
+                'none'; $('#OrderDetail').text('');">X</div>
+            <div class="box-body">
+                <div class="titlePouple" style="text-align: center;
+                    font-size: 2rem; width: 100%; height:
+                    auto!important;overflow-x: scroll;" id="idTitlePopup">Thêm
+                    thông tin</div>
+                <div id="OrderDetail" style="padding: 10px; text-align:
+                    center">
+
+                    <!-- <div class="box-footer" style="margin-top: 2rem;">
                      <a class="btn btn-primary" id='buttonSave'>Xác nhận
                      </a>
                  </div> -->
-             </div>
-         </div>
-     </div>
-     </div>
-     <div id="fadeOrderDetail"
-         onclick="document.getElementById('lightOrderDetail').style.display=
-         'none'; document.getElementById('fadeOrderDetail').style.display=
-         'none'; $('#OrderDetail').text('');" class="black_overlay">
-     </div>
- 
-     <script src='/js/ThongKe/thu.js?ver=132'></script>
-     <script src='/js/search.js?ver=132' async></script>
-    
-     <script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="fadeOrderDetail"
+        onclick="document.getElementById('lightOrderDetail').style.display=
+        'none'; document.getElementById('fadeOrderDetail').style.display=
+        'none'; $('#OrderDetail').text('');" class="black_overlay">
+    </div>
+
+    <script src='/js/ThongKe/thu.js?ver=132'></script>
+    <script src='/js/search.js?ver=132' async></script>
+
+    <script>
          $(document).ready(function () {
              TaoDataTable("idDataTable", GetColumnsForDatatable(9)).then(() => {
                  SettingSearch();
              });
          });
      </script>
- 

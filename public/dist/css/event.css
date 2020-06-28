@@ -64,7 +64,7 @@ a:focus {
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
-.container {
+/* .container {
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -84,7 +84,7 @@ a:focus {
   .container {
     width: 1170px;
   }
-}
+} */
 .col-sm-6 {
   position: relative;
   min-height: 1px;

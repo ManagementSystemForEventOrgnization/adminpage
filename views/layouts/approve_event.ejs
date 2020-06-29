@@ -21,20 +21,17 @@
     overflow-x: auto;
     }
 
-    .text-nowrap {
-    white-space: nowrap;
-    }
 
     table tr td {
     padding: 10px 20px;
     background: white;
+    overflow-wrap: break-word;
     }
 
     table tr th {
     padding: 20px;
     /* color: white; */
     background: white;
-    white-space: nowrap;
     text-align: center;
     }
 
@@ -91,13 +88,15 @@
                 </div>
                 <div class="card-body p-0" style="width: auto; overflow:
                     auto;">
+                     <div class="wrap">
+                        <div class="container">
                     <table class="table table-bordered" id="idDataTable">
                         <thead>
                             <tr>
                                 <th style="width: 50px">STT</th>
                                 <th style="min-width: 300px!important;">Tên</th>
                                 <th style="min-width: 200px!important;">Người tạo</th>
-                                <th style="min-width: 150px!important;">Loại event</th>
+                                <th style="min-width: 170px!important;">Loại event</th>
                                 <th style="min-width: 110px!important;">Người tham gia</th>
                                 <th style="min-width: 110px!important;">SL sesion</th>
                                 <th style="min-width: 140px!important;">Thời gian tạo</th>
@@ -108,7 +107,7 @@
                         <tbody>
 
                         </tbody>
-                    </table>
+                    </table></div></div>
                 </div>
                 <!-- /.card-body -->
             </div>

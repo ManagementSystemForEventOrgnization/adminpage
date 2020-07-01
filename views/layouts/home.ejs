@@ -1,14 +1,44 @@
-
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
   window.OneSignal = window.OneSignal || [];
+
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+  }
+  // Let's check whether notification permissions have already been granted
+  else if (Notification.permission === "granted") {
+    // var notification = new Notification("Hi there!");
+  }
+  // Otherwise, we need to ask the user for permission
+  else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(function (permission) {
+      if (permission === "granted") {
+        var notification = new Notification("Thanks to enable notification. Now you can require receive notification from web!");
+      }
+    });
+  }
+  
   OneSignal.push(function() {
     OneSignal.init({
       appId: "31b8a0fd-e7e8-41a9-b1bc-50428eb4f48e",
     });
+
+    OneSignal.on('subscriptionChange', function (isSubscribed) {
+      console.log("The user's subscription state is now:", isSubscribed);
+      if(isSubscribed){
+        OneSignal.sendTags({
+        id: '123312',
+      }).then(function(tagsSent) {
+        console.log('send tag');
+        // Callback called when tags have finished sending    
+      });
+      }else{
+        console.log(false);
+      }
+      
+    });
   });
 </script>
-
 <%- contentFor('body') %>
 
     <div class="row">
@@ -30,5 +60,5 @@
         </div>
     </div>
 
-<%- contentFor('loadScript') %>
-<script src='/js/search.js?ver=132' async></script>
+    <%- contentFor('loadScript') %>
+        <script src='/js/search.js?ver=132' async></script>

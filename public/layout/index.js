@@ -2,11 +2,12 @@ $(document).ready(function(){
     $('.button-left').click(function(){
         $('.sidebar').toggleClass('fliph');
     });
-
+    
  });
 
 
  function appendAlert(content, time){
+    new Notification(content);
     time = time || 2000;
     let alert = $('div .alert').length;
 

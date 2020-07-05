@@ -53,6 +53,7 @@ module.exports = {
                     ticket: 1,
                     bannerUrl: 1,
                     urlWeb: 1,
+                    domain :1,
                     'session': {
                         $filter: {
                             input: "$session",
@@ -166,7 +167,7 @@ module.exports = {
                 { $unwind: '$category' },
                 {
                     $project: {
-                        name: 1, isSellTicket: 1, ticket: 1, urlWeb: 1, userId: 1, createdAt: 1, category: 1,
+                        name: 1, isSellTicket: 1, ticket: 1, urlWeb: 1, domain: 1, userId: 1, createdAt: 1, category: 1,
                         'session': {
                             $filter: {
                                 input: "$session",

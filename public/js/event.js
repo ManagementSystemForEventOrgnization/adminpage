@@ -8,7 +8,6 @@ function GetColumnsForDatatable(count) {
     return shit;
 }
 
-
 function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
     return new Promise(function (resolve, reject) {
@@ -41,7 +40,6 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                         "targets": -1,
                         "className": "hover",
                     },
-
                 ],
                 "processing": true,
                 rowId: '_id',
@@ -100,8 +98,8 @@ function ShowSession(id) {
     document.getElementById('fadeOrderDetail').style.display = 'block';
     $.get(`/api/get_session/${id}`, (data, status) => {
         let event = data.result;
+        console.log(event)
         let arr = event.session;
-        console.log(arr);
         $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
@@ -117,7 +115,7 @@ function ShowSession(id) {
                             ${event.status || 'Run'}
                         </div>
                         <a data-opm="0"
-                            href="${baseURLWeb}/${event.urlWeb}"
+                            href="${event.domain || ''}${event.urlWeb}"
                             class="cover-img w-100 event-item-link"
                             data-event-id="79608"></a>
                     </div>
@@ -126,7 +124,7 @@ function ShowSession(id) {
                             <div class="table w-100 margin-bottom-0">
                                 <div class="table-cell event-title">
                                     <a data-opm="0"
-                                        href="${event.urlWeb}"
+                                        href="${event.domain || ''}${event.urlWeb}"
                                         title="[Livestream] Live Max Microwave
                                         2020" class="event-item-link"
                                         data-event-id="79608">

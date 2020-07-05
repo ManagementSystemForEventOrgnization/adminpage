@@ -113,7 +113,7 @@ function ShowSession(id) {
                         </div>
                         <div class="badge-live-event1" onclick="RefundMoney('${event._id}', '${e.id}'})"> Refund money </div>
                         <a data-opm="0"
-                            href="${event.urlWeb}"
+                            href="${event.domain || ''}${event.urlWeb}"
                             class="cover-img w-100 event-item-link"
                             data-event-id="79608"></a>
                     </div>
@@ -123,7 +123,7 @@ function ShowSession(id) {
                             <div class="table w-100 margin-bottom-0">
                                 <div class="table-cell event-title">
                                     <a data-opm="0"
-                                        href="${event.urlWeb}"
+                                        href="${event.domain || ''}${event.urlWeb}"
                                         title="[Livestream] Live Max Microwave
                                         2020" class="event-item-link"
                                         data-event-id="79608">

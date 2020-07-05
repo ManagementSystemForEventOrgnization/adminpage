@@ -16,6 +16,7 @@ const Base64 = require('../utils/Base64')
 // new Account({name: 'Sang', username: 'admin', hashPass: 'admin'}).save();
 
 let { formatDate } = require('../utils/mainFunction');
+const key = require('../config/key');
 
 module.exports = {
     getEvent: async (req, res) => {
@@ -97,7 +98,7 @@ module.exports = {
                         pipeline: [
                             {
                                 $match: {
-                                    'session': { $elemMatch: { isCancel: false , isReject: false } },
+                                    'session': { $elemMatch: { isCancel: false, isReject: false, paymentStatus: 'PAID' } },
                                     $expr: {
                                         $and: [{ $eq: ['$eventId', '$$event_id'] }]
                                     }
@@ -108,11 +109,32 @@ module.exports = {
                     }
                 },
                 {
+                    $lookup:
+                    {
+                        from: "payments",
+                        let: { event_id: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    'status': 'PAID',
+                                    $expr: {
+                                        $and: [{ $eq: ['$eventId', '$$event_id'] },
+                                        {$not: {$eq : [{$size : '$session'}, {$size : '$sessionRefunded'}]}}]
+                                    }
+                                }
+                            },
+                        ],
+                        as: "payments"
+                    }
+                },
+                {
                     $project: {
                         name: 1,
                         category: 1,
                         userId: 1,
                         createdAt: 1,
+                        payments : 1,
+                        totalAmount : {$sum : '$payments.amount'},
                         status: 1,
                         'session': {
                             $filter: {
@@ -130,7 +152,6 @@ module.exports = {
             ])
 
         ]).then(([Count, CountFilter, arr]) => {
-
             let result = {
                 "d": {
                     "draw": draw,
@@ -1036,11 +1057,12 @@ module.exports = {
         let orderDir = req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
-
         let query = { status: 'PAID' };
+        query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
                 Payment.aggregate([
+                    { $match: query },
                     {
                         $group: {
                             _id: null,
@@ -1080,16 +1102,6 @@ module.exports = {
                         }
                     },
                     { $unwind: "$event" },
-                    {
-                        $lookup:
-                        {
-                            from: "cards",
-                            localField: "cardId",
-                            foreignField: "_id",
-                            as: "card"
-                        }
-                    },
-                    { $unwind: "$card" },
                     { $skip: +PageNo },
                     { $limit: +pageSize },
                 ]),
@@ -1113,11 +1125,10 @@ module.exports = {
                     s2: value.senders.fullName || 'Null',
                     s3: value.receivers.fullName || "No_Name",
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
-                    s5: value.card.cardNumber || 'null',
-                    s6: value.payType,
-                    s7: (value.amount + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
-                    s8: value.event.name,
-                    s9: value.status,
+                    s5: value.payType,
+                    s6: (value.amount + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
+                    s7: value.event.name,
+                    s8: value.status,
 
 
                     // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
@@ -1140,6 +1151,7 @@ module.exports = {
         let pageSize = req.query.length;
 
         let query = { status: 'PAID' };
+        query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
                 Payment.aggregate([
@@ -1154,13 +1166,15 @@ module.exports = {
                     {
                         $match: {
                             num1: { $ne: 0 },
-                            status: 'PAID'
+                            status: 'PAID',
+                            sender: { $ne: ObjectId(key.adminId) }
                         }
                     },
                     {
                         $group: {
                             _id: null,
-                            sumTotal: { $sum: { $multiply: ['$amount', { $divide: ['$num1', '$num'] }] } }
+                            sumTotal: { $sum: { $multiply: ['$amount', { $divide: ['$num1', '$num'] }] } },
+                            totalRow: {$sum: 1}
                         }
                     }
                 ]),
@@ -1197,20 +1211,9 @@ module.exports = {
                     },
                     { $unwind: "$event" },
                     {
-                        $lookup:
-                        {
-                            from: "cards",
-                            localField: "cardId",
-                            foreignField: "_id",
-                            as: "card"
-                        }
-                    },
-                    { $unwind: "$card" },
-                    {
                         $project: {
                             status: 1,
                             senders: 1, receivers: 1,
-                            card: 1,
                             createdAt: 1,
                             amount: 1,
                             description: 1, event: 1,
@@ -1234,14 +1237,13 @@ module.exports = {
                     { $limit: +pageSize },
                 ]),
                 Payment.countDocuments(query),
-                Payment.countDocuments(query),
             ]
-        ).then(([total, arr, Count1, Count2]) => {
+        ).then(([total, arr, Count2]) => {
             let result = {
                 "d": {
                     "draw": draw || 1,
-                    "recordsTotal": Count1,
-                    "recordsFiltered": Count2,
+                    "recordsTotal": total[0]&&total[0].totalRow,
+                    "recordsFiltered": total[0]&&total[0].totalRow, // filter
                     sumTotal: total[0] && total[0].sumTotal || '0'
                 }
             }
@@ -1253,11 +1255,10 @@ module.exports = {
                     s2: value.senders.fullName || 'Null',
                     s3: value.receivers.fullName || "No_Name",
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
-                    s5: value.card.cardNumber || 'null',
-                    s6: value.payType || '',
-                    s7: ((((+value.amount || '0') / +value.num) * (+value.num1)) + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
-                    s8: value.event.name || '',
-                    s9: value.description || '',
+                    s5: value.payType || '',
+                    s6: ((((+value.amount || '0') / +value.num) * (+value.num1)) + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
+                    s7: value.event.name || '',
+                    s8: value.description || '',
 
 
                     // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>

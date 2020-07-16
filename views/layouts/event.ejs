@@ -25,21 +25,21 @@
     white-space: nowrap;
     }
 
-    table tr td {
+    #idDataTable tr td {
     padding: 10px 20px;
     background: white;
     overflow-wrap: break-word;
     }
 
-    table tr th {
+    #idDataTable tr th {
     padding: 20px;
     /* color: white; */
     background: white;
     text-align: center;
     }
 
-    table tr td:nth-child(2),
-    table tr th:nth-child(2) {
+    #idDataTable tr td:nth-child(2),
+    #idDataTable tr th:nth-child(2) {
     min-width: 100px;
     position: sticky;
     left: 0;
@@ -113,9 +113,7 @@
                                         gia</th>
                                     <th style="min-width: 110px!important;">SL
                                         sesion</th>
-                                    <th style="min-width: 140px!important;">Thời
-                                        gian
-                                        tạo</th>
+                                    <th style="min-width: 140px!important;">Tổng tiền</th>
                                     <th style="min-width: 120px!important;">Trạng
                                         thái</th>
                                     <th style='min-width: 200px!important;'>Chức
@@ -136,7 +134,7 @@
     </div>
 
     <div id="lightOrderDetail" class="white_content" style="width: 80%;
-        left: 10%; top: 10%!important; height: 80vh; overflow-y: scroll;">
+        left: 10%; top: 10%!important; height: 80vh; overflow-y: auto;">
         <div class="box" style="position: relative;">
             <div style="position: absolute; top: 3px; right: 3px; font-size:
                 37px; color: red; cursor: pointer;"
@@ -147,7 +145,7 @@
             <div class="box-body">
                 <div class="titlePouple" style="text-align: center;
                     font-size: 2rem; width: 100%; height:
-                    auto!important;overflow-x: scroll;" id="idTitlePopup">Thêm
+                    auto!important;overflow-x: auto;" id="idTitlePopup">Thêm
                     thông tin</div>
                 <div id="OrderDetail" style="padding: 10px; text-align:
                     center">

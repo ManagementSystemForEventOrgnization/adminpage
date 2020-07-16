@@ -7,6 +7,7 @@ const EventCategory = mongoose.model('eventCategory');
 const Branch = mongoose.model('branches');
 const Department = mongoose.model('departments');
 const Account = mongoose.model('accounts')
+const Payment = mongoose.model('payment')
 const Axios = require('axios');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -213,6 +214,20 @@ module.exports = {
         }
         let arr = u.userReport;
         res.status(200).json({ result: { list: arr, userName: u.fullName } });
+    },
+
+    get_payment_event: async (req,res,next)=>{
+// id của event
+        let {id} = req.params;
+        if(!id){
+            return res.status(600).json({message: 'Invalid data'});
+        }
+
+        let payment = await Payment.find({ status: 'PAID', eventId: ObjectId(id), sessionRefunded: {$size : 0}})
+        .populate("eventId").populate("sender");
+
+        res.status(200).json({data: payment}); 
+
     }
 
 

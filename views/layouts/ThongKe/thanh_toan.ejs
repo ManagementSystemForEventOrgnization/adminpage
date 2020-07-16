@@ -2,14 +2,7 @@
 <link rel="stylesheet" href="/dist/css/event.css" />
 <link rel="stylesheet" href="/dist/css/popup.css">
 <style>
-    .totalAmount{
-        float: right;
-        padding-top: 30px;
-        padding-right: 100px;
-        font-size: 40px;
-        color: red;
-    }
-    .nameEvent{
+      .nameEvent{
     height: 70px !important;
     overflow: auto;
   }
@@ -35,6 +28,7 @@
     table tr td {
     padding: 10px 20px;
     background: white;
+    overflow-wrap: break-word;
     }
 
     table tr th {
@@ -51,26 +45,22 @@
     left: 0;
     z-index: 9;
     }
-    
-    table tr td:nth-child(3),
-    table tr th:nth-child(3) {
-    position: sticky;
-    left: 200px;
-    z-index: 9;
-    }
+
 </style>
 <%- contentFor('body') %>
     <div class="row">
         <div class="col-10 row" style="padding-bottom: 1rem">
-            <div class="col-md-3 form-group hidden">
+            <div class="col-md-3 form-group">
                 <label class="margin-top">Trạng thái</label>
                 <select class="form-control" onchange="search1()" id="idTT">
                     <option value="">Lựa chọn ở đây</option>
                     <option value="DRAFT">DRAFT</option>
                     <option value="PENDING">WAITING</option>
+                    <option value="CANCEL">CANCEL</option>
+                    <option value="PUBLIC">PUBLIC</option>
                 </select>
             </div>
-            <div class="col-md-3 form-group hidden">
+            <div class="col-md-3 form-group">
                 <label class="margin-top">Loại</label>
                 <div class="funkyradio">
                     <div class="funkyradio-primary col-md-12"
@@ -82,12 +72,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 form-group hidden">
+            <div class="col-md-3 form-group">
                 <label class="margin-top">Ngày bắt đầu</label>
                 <input type="text" id="startDate" class="form-control col-sm-12
                     hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
             </div>
-            <div class="col-md-3 form-group hidden">
+            <div class="col-md-3 form-group">
                 <label class="margin-top">Ngày kết thúc</label>
                 <input type="text" id="endDate" class="form-control col-sm-12
                     hasDatepicker" style="width: 30vw;" placeholder="Ngày" />
@@ -103,28 +93,25 @@
         <!-- <div class="col-12" style="margin: auto"> -->
         <div class="card">
             <div class="card-header">
-                <a class="card-title">Thống kê thu tiền từ người dùng</a>
+                <a class="card-title">Danh sách sự kiện đã đăng kí</a>
             </div>
             <div class="card-body p-0" style="width: auto; overflow:
-                auto;"><div class="wrap">
+                auto;">
+                <div class="wrap">
                     <div class="container">
                         <table class="table table-bordered" id="idDataTable">
                             <thead>
                                 <tr>
                                     <th style="width: 50px">STT</th>
-                                    <th style="min-width: 200px!important;">Người
-                                        gữi</th>
-                                    <th style="min-width: 200px!important;">Người
-                                        nhận</th>
-                                    <th style="min-width: 200px!important;">Ngày
-                                        gữi</th>
-                                    <th style="min-width: 150px!important;">payType</th>
-                                    <th style="min-width: 110px!important;">Số
-                                        tiền</th>
-                                    <th style="min-width: 110px!important;">Tên
-                                        sự kiện</th>
-                                    <th style="min-width: 120px!important;">Trạng
-                                        thái</th>
+                                    <th style="min-width: 200px!important;">Tên</th>
+                                    <th style="min-width: 200px!important;">Người tạo</th>
+                                    <th style="min-width: 150px!important;">Loại event</th>
+                                    <th style="min-width: 110px!important;">Người tham gia</th>
+                                    <th style="min-width: 110px!important;">Số tiền thanh toán</th>
+                                    <th style="min-width: 140px!important;">Tiền nhận</th>
+                                    <th style="min-width: 120px!important;">Trạng thái</th>
+                                    <th style='min-width: 200px!important;'>Chức
+                                        năng</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -136,8 +123,6 @@
 
             </div>
             <!-- /.card-body -->
-            <div><div class="totalAmount"><label>Tổng tiền: </label> <span
-                        id='totalAmount'></span> <span>đ</span></div></div>
         </div>
         <!-- </div> -->
     </div>
@@ -150,7 +135,7 @@
                 onclick="document.getElementById('lightOrderDetail').style.display=
                 'none';
                 document.getElementById('fadeOrderDetail').style.display=
-                'none'; $('#OrderDetail').text('');">X</div>
+                'none';$('#idBodyReport > tr').remove()">X</div>
             <div class="box-body">
                 <div class="titlePouple" style="text-align: center;
                     font-size: 2rem; width: 100%; height:
@@ -158,11 +143,20 @@
                     thông tin</div>
                 <div id="OrderDetail" style="padding: 10px; text-align:
                     center">
+                    <table class="table table-hover table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên user</th>
+                                <th>Số tiền</th>
+                                <th>Loại</th>
+                                <th>Thời gian </th>
+                            </tr>
+                        </thead>
+                        <tbody id='idBodyReport'>
 
-                    <!-- <div class="box-footer" style="margin-top: 2rem;">
-                     <a class="btn btn-primary" id='buttonSave'>Xác nhận
-                     </a>
-                 </div> -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -170,16 +164,18 @@
     <div id="fadeOrderDetail"
         onclick="document.getElementById('lightOrderDetail').style.display=
         'none'; document.getElementById('fadeOrderDetail').style.display=
-        'none'; $('#OrderDetail').text('');" class="black_overlay">
+        'none';$('#idBodyReport > tr').remove(); " class="black_overlay">
     </div>
 
-    <script src='/js/ThongKe/thu.js?ver=132'></script>
-    <script src='/js/search.js?ver=132' async></script>
+    <%- contentFor('loadScript') %>
+        <script src='/js/ThongKe/thanh_toan.js?ver=132'></script>
+        <script src='/js/search.js?ver=132' async></script>
 
-    <script>
-         $(document).ready(function () {
-             TaoDataTable("idDataTable", GetColumnsForDatatable(8)).then(() => {
-                 SettingSearch();
-             });
-         });
-     </script>
+        <script>
+        $(document).ready(function () {
+            TaoDataTable("idDataTable", GetColumnsForDatatable(9)).then(() => {
+                SettingSearch();
+               
+            });
+        });
+    </script>

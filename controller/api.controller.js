@@ -12,7 +12,7 @@ const Chi = mongoose.model('chis');
 const Passport = require('passport');
 const Axios = require('axios');
 const key = require('../config/key');
-
+const Payment = mongoose.model('payment')
 const notification = require('../utils/notification');
 const { response } = require('express');
 
@@ -682,6 +682,54 @@ module.exports = {
                 return res.status(200).json({ result: user });
             });
         })(req, res, next);
+    },
+
+    thanh_toan: async (req, res, next) => {
+        let { id, amount } = req.body;
+        if (!id) {
+            return res.status(600).json({ message: 'Invalid data' });
+        }
+
+        let e = await Event.findById(id);
+
+        const pay = new Payment({
+            sender: key.adminId,
+            eventId: id,
+            receiver: e.userId,
+            amount: amount,
+            description: 'Thanh toán sự kiện',
+            payType: "ZALOPAY",
+            status: "PAID",
+            session: []
+        });
+
+
+        e.paymentId = pay._id;
+        const newNotification = new Notification({
+            sender: key.adminId,
+            receiver: e.userId,
+            type: "ADMIN_PAYMENT",
+            message: "",
+            title: "Admin sent money",
+            linkTo: {
+                key: "PaymentInfo",
+                _id: pay._id
+            },
+            isRead: false,
+            isDelete: false,
+            session: []
+        });
+        Promise.all([
+            pay.save(),
+            e.save(),
+            newNotification.save()
+        ]).then(d => {
+            res.status(200).json({ result: true });
+
+        }).catch(e => {
+            res.status(600).json({ message: "Something is wrong!" });
+        })
+
     },
 
     push_notification: async (req, res, next) => {

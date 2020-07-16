@@ -96,8 +96,6 @@ box-sizing: border-box;
   height: 45px;
   overflow: auto;
 }
-.popup-box .popup-messages {
-}
 .popup-head-left img {
   border: 1px solid #7b7b7b;
   border-radius: 50%;
@@ -147,7 +145,7 @@ box-sizing: border-box;
 .popup-box .popup-messages {
   background: transparent none repeat scroll 0 0;
   height: 275px;
-  /* overflow: auto; */
+
 }
 .direct-chat-messages {
   /* overflow: auto; */
@@ -205,6 +203,7 @@ box-sizing: border-box;
 }
 .popup-messages .direct-chat-messages {
   height: auto;
+  overflow: auto;
 }
 .popup-messages .direct-chat-text {
   background: #dfece7 none repeat scroll 0 0;
@@ -232,6 +231,9 @@ box-sizing: border-box;
   color: black;
   width: 140px;
   opacity: 0.9;
+  white-space: nowrap;
+  height: 45px;
+  overflow: auto;
 }
 .popup-messages .direct-chat-name-admin {
   font-size: 15px;

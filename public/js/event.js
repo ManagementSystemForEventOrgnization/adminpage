@@ -158,7 +158,7 @@ function ShowSession(id) {
                         <div class="event-date">
                             <div class="relative">
                                 <div class="date-month">
-                                   Tháng ${new Date(e.day).getMonth()}
+                                   Tháng ${new Date(e.day).getMonth() + 1}
                                 </div>
                                 <div class="date-detail">
                                     <div class="date-num color-6">

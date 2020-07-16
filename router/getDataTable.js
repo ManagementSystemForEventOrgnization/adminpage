@@ -18,5 +18,6 @@ router.get('/Department', getDataTable.Department)
 router.get('/thu',getDataTable.thu);
 router.get('/event_cancel',getDataTable.getEventCancel);
 router.get('/refund',getDataTable.refund);
-
+router.get('/chi',getDataTable.chi);
+router.get('/thanh_toan',getDataTable.thanh_toan);
 module.exports = router;

@@ -33,7 +33,14 @@ router.post('/require_edit_event', apiController.require_edit_event);
 
 router.post('/event/reject_user', apiController.reject_event);
 router.post('/login',apiController.login);
+
+router.post('/thanh_toan',apiController.thanh_toan);
+
+
+
 router.post('/push_notification', apiController.push_notification)
+
+
 
 
 module.exports = router;

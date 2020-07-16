@@ -17,6 +17,9 @@ router.get('/approve_event', indexController.approve_event);
 router.get('/login', indexController.login);
 router.get('/thu', indexController.thu);
 router.get('/refund', indexController.refund);
+router.get('/chi', indexController.chi);
 router.get('/require_edit_event', indexController.require_edit_event)
+
+router.get('/thanh_toan', indexController.thanh_toan);
 
 module.exports = router;

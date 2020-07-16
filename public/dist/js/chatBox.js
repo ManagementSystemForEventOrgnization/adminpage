@@ -67,10 +67,8 @@ class ChatBox {
             $(`#chatContent${v.id}`).keypress(function (event) {
                 if (event.keyCode === 13) {
                     let content = $(`#chatContent${v.id}`).val().trim();
-
                     if (content != '')
                         if (!event.shiftKey) {
-
                             $(`#chatContent${v.id}`).val('');
                             chatBox.appendAdminChat({ id: v.id, src: 'admin', content })
                             socket.emit('admin-sent-content', { src: 'admin', content, user: v })
@@ -147,7 +145,8 @@ class ChatBox {
                             </div> -->
                         </div>`;
             $(`#contentChat${v.id}`).prepend(html);
-
+            let message = document.getElementById(`contentChat${v.id}`);
+            message.scrollTop = message.scrollHeight;
         }
         return true;
     }
@@ -171,6 +170,8 @@ class ChatBox {
                             </div> -->
                         </div>`;
             $(`#contentChat${v.id}`).prepend(html);
+            let message = document.getElementById(`contentChat${v.id}`);
+            message.scrollTop = message.scrollHeight;
         }
         return true;
     }
@@ -194,6 +195,8 @@ class ChatBox {
                             </div> -->
                         </div>`;
             $(`#contentChat${v.id}`).append(html);
+            let message = document.getElementById(`contentChat${v.id}`);
+            message.scrollTop = message.scrollHeight;
         }
         return true;
     }
@@ -216,7 +219,9 @@ class ChatBox {
                                 <span class="direct-chat-timestamp pull-right">3.36 PM</span>
                             </div> -->
                         </div>`;
-            $(`#contentChat${v.id}`).append(html);;
+            $(`#contentChat${v.id}`).append(html);
+            let message = document.getElementById(`contentChat${v.id}`);
+            message.scrollTop = message.scrollHeight;
         }
         return true;
     }
@@ -267,8 +272,8 @@ socket.on('userSentMessage', data => {
     let id = data.user.id; // thang nay moi la id dun
     chatBox.appendUserChat({ id, src: data.user.fullName, content: data.data.content })
     $(`#numberMessage${id}`).text(data.user.number);
-    let message = document.getElementById(`contentChat${v.id}`);
-    message.scrollTop = message.scrollHeight;
+    // let message = document.getElementById(`contentChat${id}`);
+    // message.scrollTop = message.scrollHeight;
 })
 
 socket.on('user-leave', user => {
@@ -294,10 +299,10 @@ $(function () {
         chatBox.maxLength = ~~((+window.outerWidth - 318) / 302);
     })
 
-    if(sessionStorage.getItem('chatBox')==1){
+    if (sessionStorage.getItem('chatBox') == 1) {
         document.getElementById('qnimate').classList.toggle('showChatBox');
     }
-    
+
     socket.emit("getUser", data => {
         $("#boxContent").html("");
         userActive = [...data];
@@ -350,12 +355,20 @@ function addNewUser(v) {
         let checkBoxExits = $(`#${u.id}`);
         chatBox.appendBox(u);
         if (!checkBoxExits[0]) {
+
+            let numRead = $(`#numberMessage${v.id}`).text();
+            if(numRead){
+                // sang1
+                socket.emit('update-read', { user : v });
+                $(`#numberMessage${v.id}`).text('');
+            }
+
             $.get(`/api/chat/get_list?sender=${v.id}`, (data, status) => {
 
                 let user = v;
                 let arr = data.result;
 
-                let func = async () => {
+                let func = () => {
                     return new Promise((res, rej) => {
                         arr.forEach(e => {
                             if (e.sender != 'admin') {
@@ -365,14 +378,13 @@ function addNewUser(v) {
                             }
 
                         });
+
                         res('res');
                     })
 
                 }
 
                 func().then(dd => {
-                    let message = document.getElementById(`contentChat${v.id}`);
-                    message.scrollTop = message.scrollHeight;
                     chatBox.appendLoadMore(v);
                 }
                 ).catch(er => {

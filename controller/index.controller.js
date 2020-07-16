@@ -228,7 +228,28 @@ module.exports = {
     };
     res.render('ThongKe/refund', {
     })
-  }
+  },
 
+  chi: async (req, res, next) => {
+    res.locals = {
+      title: 'Chi',
+      message: 'This is a message',
+      Active: '.chi #products'
+    };
+    res.render('ThongKe/chi', {
+    })
+  },
+  thanh_toan: async (req, res, next) => {
+    res.locals = {
+      title: 'Thanh toán tiền',
+      message: 'This is a message',
+      Ten: 'sang',
+      mUserId: 'NULL',
+      Active: '.thanh_toan #products'
+    };
 
+    res.render('ThongKe/thanh_toan', {
+      // additional locals, a custom layout, or other options can be defined here
+    });
+  },
 };

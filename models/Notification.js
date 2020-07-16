@@ -9,10 +9,11 @@ const notificationSchema = new Schema({
     title: String,
     linkTo: {
         key: String, // noti key link to screen
-        _id: Schema.Types.ObjectId // id object link to
+        _id: Schema.Types.ObjectId, // id object link to
+        urlWeb: String
     },
-    isRead: Boolean,
-    isDelete: Boolean,
+    isRead: { type: Boolean, default: false },
+    isDelete: { type: Boolean, default: false },
     session: [String],
 }, { 
 	timestamps: { 

@@ -15,8 +15,9 @@ const Base64 = require('../utils/Base64')
 // new Department({name: 'Admin'}).save();
 // new Account({name: 'Sang', username: 'admin', hashPass: 'admin'}).save();
 
-let { formatDate } = require('../utils/mainFunction');
+let { formatDate, formatCurrency } = require('../utils/mainFunction');
 const key = require('../config/key');
+const { format } = require('morgan');
 
 module.exports = {
     getEvent: async (req, res) => {
@@ -98,7 +99,10 @@ module.exports = {
                         pipeline: [
                             {
                                 $match: {
-                                    'session': { $elemMatch: { isCancel: false, isReject: false, paymentStatus: 'PAID' } },
+                                    $or: [
+                                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentStatus: 'PAID' } } },
+                                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentId: { $exists: false } } } }
+                                    ],
                                     $expr: {
                                         $and: [{ $eq: ['$eventId', '$$event_id'] }]
                                     }
@@ -119,7 +123,7 @@ module.exports = {
                                     'status': 'PAID',
                                     $expr: {
                                         $and: [{ $eq: ['$eventId', '$$event_id'] },
-                                        {$not: {$eq : [{$size : '$session'}, {$size : '$sessionRefunded'}]}}]
+                                        { $not: { $eq: [{ $size: '$session' }, { $size: '$sessionRefunded' }] } }]
                                     }
                                 }
                             },
@@ -133,8 +137,8 @@ module.exports = {
                         category: 1,
                         userId: 1,
                         createdAt: 1,
-                        payments : 1,
-                        totalAmount : {$sum : '$payments.amount'},
+                        payments: 1,
+                        totalAmount: { $sum: '$payments.amount' },
                         status: 1,
                         'session': {
                             $filter: {
@@ -169,7 +173,7 @@ module.exports = {
                     s4: value.category[0] && value.category[0].name || "Null",
                     s5: `<div onclick="document.location.href='/event/applyEvent/${value._id}'" class="moveClick" > ${value.numberJoin || '0'}</div>`,
                     s6: `<div class="moveClick" onclick='ShowSession("${value._id}")'> ${value.session.length || '0'}</div>`,
-                    s7: formatDate(value.createdAt),
+                    s7: formatCurrency(value.totalAmount), //formatDate(value.createdAt),
                     s8: value.status || 'PENDING',
                     s9: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
                     <a title='Danh sách đăng kí' class='btn btn-warning' href="/event/applyEvent/${value._id}" > <i class="fa fa-list-alt"></i> </a>`,
@@ -240,12 +244,32 @@ module.exports = {
                         as: "category"
                     }
                 },
+                // {
+                //     $lookup:
+                //     {
+                //         from: "applyevents",
+                //         localField: "_id",
+                //         foreignField: "eventId",
+                //         as: "join"
+                //     }
+                // },
                 {
-                    $lookup:
-                    {
+                    $lookup: {
                         from: "applyevents",
-                        localField: "_id",
-                        foreignField: "eventId",
+                        let: { event_id: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $or: [
+                                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentStatus: 'PAID' } } },
+                                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentId: { $exists: false } } } }
+                                    ],
+                                    $expr: {
+                                        $and: [{ $eq: ['$eventId', '$$event_id'] }]
+                                    }
+                                }
+                            },
+                        ],
                         as: "join"
                     }
                 },
@@ -434,14 +458,14 @@ module.exports = {
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
         let conditionMain = { 'eventId': ObjectId(idEvent) };
-        conditionMain.session = { $elemMatch: { isCancel: false } }
+        conditionMain.session = { $elemMatch: { isCancel: { $ne: true } } }
         if (idSession) {
             conditionMain.session.$elemMatch.id = idSession;// = { $elemMatch: { id: idSession, status: 'JOINED', isReject: false } }
         }
         Promise.all([
             ApplyEvent.countDocuments(conditionMain),
             ApplyEvent.aggregate([
-                { $match: { 'eventId': ObjectId(idEvent), session: { $elemMatch: { isCancel: false } } } },
+                { $match: { 'eventId': ObjectId(idEvent), session: { $elemMatch: { isCancel: { $ne: true } } } } },
                 {
                     $lookup:
                     {
@@ -493,7 +517,6 @@ module.exports = {
                 { $limit: +pageSize },
             ])
         ]).then(([Count, CountFilter1, arr]) => {
-            console.log(CountFilter1, Count);
             let CountFilter = CountFilter1[0] ? (CountFilter1[0].passing_scores || 0) : 0;
             let result = {
                 "d": {
@@ -511,10 +534,9 @@ module.exports = {
                     s4: value.users[0].gender || '',
                     s5: value.users[0].phone || '0',
                     s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || '0'} </div>`,
-                    s7: formatDate(value.createdAt),
-                    s8: value.qrcode,
+                    s7: formatDate(value.createdAt) || "123",
+                    s8: value.qrcode || "",
                     s9: ('PENDING'),
-                    s10: ``, // can them cac button vao.
                 })
             });
 
@@ -1057,7 +1079,7 @@ module.exports = {
         let orderDir = req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
-        let query = { status: 'PAID' };
+        let query = { status: 'PAID', sender: { $ne: ObjectId(key.adminId) } };
         query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
@@ -1126,7 +1148,7 @@ module.exports = {
                     s3: value.receivers.fullName || "No_Name",
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
                     s5: value.payType,
-                    s6: (value.amount + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
+                    s6: formatCurrency(value.amount) ,
                     s7: value.event.name,
                     s8: value.status,
 
@@ -1150,7 +1172,7 @@ module.exports = {
         let PageNo = req.query.start;
         let pageSize = req.query.length;
 
-        let query = { status: 'PAID' };
+        let query = { status: 'PAID', sender: { $ne: ObjectId(key.adminId) } };
         query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
@@ -1174,7 +1196,7 @@ module.exports = {
                         $group: {
                             _id: null,
                             sumTotal: { $sum: { $multiply: ['$amount', { $divide: ['$num1', '$num'] }] } },
-                            totalRow: {$sum: 1}
+                            totalRow: { $sum: 1 }
                         }
                     }
                 ]),
@@ -1242,8 +1264,8 @@ module.exports = {
             let result = {
                 "d": {
                     "draw": draw || 1,
-                    "recordsTotal": total[0]&&total[0].totalRow,
-                    "recordsFiltered": total[0]&&total[0].totalRow, // filter
+                    "recordsTotal": total[0] && total[0].totalRow || '0',
+                    "recordsFiltered": total[0] && total[0].totalRow || '0', // filter
                     sumTotal: total[0] && total[0].sumTotal || '0'
                 }
             }
@@ -1256,7 +1278,7 @@ module.exports = {
                     s3: value.receivers.fullName || "No_Name",
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
                     s5: value.payType || '',
-                    s6: ((((+value.amount || '0') / +value.num) * (+value.num1)) + '').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."),
+                    s6: formatCurrency((((+value.amount || '0') / +value.num) * (+value.num1))),
                     s7: value.event.name || '',
                     s8: value.description || '',
 
@@ -1268,6 +1290,266 @@ module.exports = {
             result.d.data = arrDT;
             res.send(result);
         })
-    }
+    },
+
+    chi: async (req, res, next) => {
+        let search = req.query.myCustomParams;
+        let { status, startDate, endDate, fee } = req.query.multiSearch;
+
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+
+        let query = { status: 'PAID', sender: ObjectId(key.adminId) };
+        query.sender = { $ne: ObjectId(key.adminId) }
+        Promise.all(
+            [
+                Payment.aggregate([
+                    { $match: query },
+                    {
+                        $group: {
+                            _id: null,
+                            sumTotal: { $sum: '$amount' },
+                            totalRow: { $sum: 1 }
+                        }
+                    }
+                ]),
+                Payment.aggregate([
+                    { $match: query },
+                    {
+                        $lookup:
+                        {
+                            from: "users",
+                            localField: "sender",
+                            foreignField: "_id",
+                            as: "senders"
+                        }
+                    },
+                    { $unwind: "$senders" },
+                    {
+                        $lookup:
+                        {
+                            from: "users",
+                            localField: "receiver",
+                            foreignField: "_id",
+                            as: "receivers"
+                        }
+                    },
+                    { $unwind: "$receivers" },
+                    {
+                        $lookup:
+                        {
+                            from: "events",
+                            localField: "eventId",
+                            foreignField: "_id",
+                            as: "event"
+                        }
+                    },
+                    { $unwind: "$event" },
+                    {
+                        $project: {
+                            status: 1,
+                            senders: 1, receivers: 1,
+                            createdAt: 1,
+                            amount: 1,
+                            description: 1, event: 1,
+                            payType: 1,
+                            num: { $size: '$session' },
+                            num1: { $size: '$sessionRefunded' }
+                        }
+                    },
+                    { $skip: +PageNo },
+                    { $limit: +pageSize },
+                ]),
+                Payment.countDocuments(query),
+            ]
+        ).then(([total, arr, Count2]) => {
+            let result = {
+                "d": {
+                    "draw": draw || 1,
+                    "recordsTotal": total[0] && total[0].totalRow || '0',
+                    "recordsFiltered": total[0] && total[0].totalRow || '0', // filter
+                    sumTotal: total[0] && total[0].sumTotal || '0'
+                }
+            }
+            let arrDT = [];
+
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    s1: +index + 1 + +PageNo,
+                    s2: value.senders.fullName || 'Null',
+                    s3: value.receivers.fullName || "No_Name",
+                    s4: new Date(value.createdAt).toLocaleString() || "Null",
+                    s5: value.payType || '',
+                    s6: formatCurrency((((+value.amount || '0') / +value.num) * (+value.num1)) + ''),
+                    s7: value.event.name || '',
+                    s8: value.description || '',
+                    // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
+                    // <a title='Danh sách đăng kí' class='btn bg-primary' href="/event/applyEvent/${value._id}" > <i class="fas fa-align-justify"></i> </a>`,
+                })
+            });
+            result.d.data = arrDT;
+            res.send(result);
+        })
+    },
+
+    thanh_toan: async (req, res) => {
+        let search = req.query.myCustomParams;
+        let { status, startDate, endDate, fee } = req.query.multiSearch;
+
+        let draw = req.query.draw;
+        let order = req.query.order[0].column;
+        let orderDir = req.query.order[0].dir;
+        let PageNo = req.query.start;
+        let pageSize = req.query.length;
+        // have to update condition.
+        let query = { 'status': 'PUBLIC', paymentId: { $exists: false }, isSellTicket: true};
+
+        if (search != "") {
+            query.$text = { $search: search };
+        }
+        let arrSort = ['_id', 'name', 'userId', 'category', '_id', 'createdAt', 'status', '_id', '_id', '_id'];
+
+        let conditionSort = {};
+        conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
+        Promise.all([
+            Event.aggregate([
+                { $match: query },
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            Event.aggregate([
+                { $match: query },
+                {
+                    $count: "passing_scores"
+                }
+            ]),
+            Event.aggregate([
+                { $match: query },
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userId"
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: "eventcategories",
+                        localField: "category",
+                        foreignField: "_id",
+                        as: "category"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "applyevents",
+                        let: { event_id: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $or: [
+                                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentStatus: 'PAID' } } },
+                                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentId: { $exists: false } } } }
+                                    ],
+                                    $expr: {
+                                        $and: [{ $eq: ['$eventId', '$$event_id'] }]
+                                    }
+                                }
+                            },
+                        ],
+                        as: "join"
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: "payments",
+                        let: { event_id: "$_id" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    'status': 'PAID',
+                                    $expr: {
+                                        $and: [{ $eq: ['$eventId', '$$event_id'] },
+                                        { $not: { $eq: [{ $size: '$session' }, { $size: '$sessionRefunded' }] } }]
+                                    }
+                                }
+                            },
+                        ],
+                        as: "payments"
+                    }
+                },
+                {
+                    $project: {
+                        name: 1,
+                        category: 1,
+                        payments:1,
+                        userId: 1,
+                        totalAmount: { $sum: '$payments.amount' },
+                        createdAt: 1,
+                        status: 1,
+                        'session': {
+                            $filter: {
+                                input: "$session",
+                                as: "item",
+                                cond: { $not: { $eq: ["$$item.isCancel", true] } }
+                            }
+                        },
+                        sessionTemp: {
+                            $filter: {
+                                input: "$session",
+                                as: "item1",
+                                cond: { $and: [{ $gte: ["$$item1.day", new Date()] }, { $ne: ["$$item1.isCancel", true] }] }
+                            }
+                        },
+                        numberJoin: { $cond: { if: { $isArray: "$join" }, then: { $size: "$join" }, else: "0" } }
+                    }
+                },
+                {
+                    $match: {
+                        sessionTemp: { $size: 0 },
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+                { $skip: +PageNo },
+                { $limit: +pageSize },
+            ])
+        ]).then(([Count, CountFilter, arr]) => {
+            let result = {
+                "d": {
+                    "draw": draw,
+                    "recordsTotal": Count[0] && Count[0].passing_scores || 0,
+                    "recordsFiltered": CountFilter[0] && CountFilter[0].passing_scores || 0,
+                }
+            }
+            let arrDT = [];
+            arr.forEach((value, index) => {
+                arrDT.push({
+                    _id: value.id,
+                    s1: +index + 1 + +PageNo,
+                    s2: `<div class='nameEvent'>${value.name || 'Null'}</div>`,
+                    s3: value.userId[0] && value.userId[0].fullName || "No_Name",
+                    s4: value.category[0] && value.category[0].name || "Null",
+                    s5: `<div class="" > ${value.numberJoin || '0'}</div>`,
+                    s6: `<div class="moveClick" onclick='ShowSession("${value._id}")'> ${formatCurrency(value.totalAmount)}</div>`,
+                    s7: formatCurrency((+value.totalAmount*90/100)),
+                    s8: value.status || 'WAITING',
+                    s9: `<a title='Public' class='btn btn-warning' href="javascript: void(0);" onclick='ThanhToan("${value._id}", "${(+value.totalAmount*90/100)}")' > <i class="fa fa-check-circle"></i> </a>`,
+                })
+            });
+            result.d.data = arrDT;
+            res.send(result);
+        }).catch(err => {
+            console.log(err);
+        })
+    },
+
 
 }

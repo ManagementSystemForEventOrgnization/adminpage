@@ -679,7 +679,7 @@ module.exports = {
         let PageNo = req.query.start;
         let pageSize = req.query.length;
 
-        let query = { isReported: false };//{ dateDelete: { $exists: false } };
+        let query = { isReported: false, dateDelete: { $exists: false } };
         if (search != "") {
             query.$text = { $search: search };
         }
@@ -692,7 +692,7 @@ module.exports = {
         conditionSort[arrSort[+order]] = (orderDir == 'desc' ? (-1) : (1));
 
         Promise.all([
-            User.countDocuments({ isReported: false }),//({ dateDelete: { $exists: false } }),
+            User.countDocuments({ isReported: false, dateDelete: { $exists: false } }),
             User.countDocuments(query),
             User.find(query).skip(+PageNo).limit(+pageSize).sort(conditionSort)
         ]).then(([Count, CountFilter, arr]) => {
@@ -1148,7 +1148,7 @@ module.exports = {
                     s3: value.receivers.fullName || "No_Name",
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
                     s5: value.payType,
-                    s6: formatCurrency(value.amount) ,
+                    s6: formatCurrency(value.amount),
                     s7: value.event.name,
                     s8: value.status,
 
@@ -1398,14 +1398,14 @@ module.exports = {
     thanh_toan: async (req, res) => {
         let search = req.query.myCustomParams;
         let { status, startDate, endDate, fee } = req.query.multiSearch;
-
+        
         let draw = req.query.draw;
         let order = req.query.order[0].column;
         let orderDir = req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
         // have to update condition.
-        let query = { 'status': 'PUBLIC', paymentId: { $exists: false }, isSellTicket: true};
+        let query = { 'status': 'PUBLIC', paymentId: { $exists: false }, isSellTicket: true };
 
         if (search != "") {
             query.$text = { $search: search };
@@ -1414,15 +1414,22 @@ module.exports = {
 
         let conditionSort = {};
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
+
+        let countDocument = Event.countDocuments();
+
         Promise.all([
             Event.aggregate([
                 { $match: query },
+                { $project: { id: 1, lastSession: { $slice: ["$session", -1] } } },
+                { $match: { 'lastSession.day': { $lt: new Date() } } },
                 {
                     $count: "passing_scores"
                 }
             ]),
             Event.aggregate([
                 { $match: query },
+                { $project: { id: 1, lastSession: { $slice: ["$session", -1] } } },
+                { $match: { 'lastSession.day': { $lt: new Date() } } },
                 {
                     $count: "passing_scores"
                 }
@@ -1490,7 +1497,7 @@ module.exports = {
                     $project: {
                         name: 1,
                         category: 1,
-                        payments:1,
+                        payments: 1,
                         userId: 1,
                         totalAmount: { $sum: '$payments.amount' },
                         createdAt: 1,
@@ -1502,19 +1509,20 @@ module.exports = {
                                 cond: { $not: { $eq: ["$$item.isCancel", true] } }
                             }
                         },
-                        sessionTemp: {
-                            $filter: {
-                                input: "$session",
-                                as: "item1",
-                                cond: { $and: [{ $gte: ["$$item1.day", new Date()] }, { $ne: ["$$item1.isCancel", true] }] }
-                            }
-                        },
+                        // sessionTemp: {
+                        //     $filter: {
+                        //         input: "$session",
+                        //         as: "item1",
+                        //         cond: { $and: [{ $gte: ["$$item1.day", new Date()] }, { $ne: ["$$item1.isCancel", true] }] }
+                        //     }
+                        // },
+                        lastSession: { $slice: ["$session", -1] },
                         numberJoin: { $cond: { if: { $isArray: "$join" }, then: { $size: "$join" }, else: "0" } }
                     }
                 },
                 {
                     $match: {
-                        sessionTemp: { $size: 0 },
+                        'lastSession.day': { $lt: new Date() },
                     }
                 },
                 { $sort: { createdAt: -1 } },
@@ -1539,9 +1547,9 @@ module.exports = {
                     s4: value.category[0] && value.category[0].name || "Null",
                     s5: `<div class="" > ${value.numberJoin || '0'}</div>`,
                     s6: `<div class="moveClick" onclick='ShowSession("${value._id}")'> ${formatCurrency(value.totalAmount)}</div>`,
-                    s7: formatCurrency((+value.totalAmount*90/100)),
+                    s7: formatCurrency((+value.totalAmount * 90 / 100)),
                     s8: value.status || 'WAITING',
-                    s9: `<a title='Public' class='btn btn-warning' href="javascript: void(0);" onclick='ThanhToan("${value._id}", "${(+value.totalAmount*90/100)}")' > <i class="fa fa-check-circle"></i> </a>`,
+                    s9: `<a title='Public' class='btn btn-warning' href="javascript: void(0);" onclick='ThanhToan("${value._id}", "${(+value.totalAmount * 90 / 100)}")' > <i class="fa fa-check-circle"></i> </a>`,
                 })
             });
             result.d.data = arrDT;

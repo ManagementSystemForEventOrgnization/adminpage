@@ -14,6 +14,7 @@ module.exports = {
       mUserId: 'NULL',
       Active: 'home'
     };
+    // console.log(req.user);
     // send_notification('Test thong baos 1')
     res.render('home', {
       // additional locals, a custom layout, or other options can be defined here
@@ -201,6 +202,7 @@ module.exports = {
   },
 
   login: async (req, res, next) => {
+
     res.locals = {
       title: 'ApplyEvent',
       message: 'This is a message',

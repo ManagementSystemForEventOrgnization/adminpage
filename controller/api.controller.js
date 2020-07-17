@@ -678,8 +678,8 @@ module.exports = {
                 if (err) {
                     return res.status(600).json({ message: err });
                 }
-
-                return res.status(200).json({ result: user });
+                res.redirect('/');
+                // return res.status(200).json({ result: user });
             });
         })(req, res, next);
     },

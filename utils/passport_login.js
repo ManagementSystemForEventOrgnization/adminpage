@@ -13,6 +13,7 @@ module.exports = (app) => {
 
     passport.deserializeUser((id, done) => {
         // save req.user
+        console.log(id)
         return done(null, id);
     });
 

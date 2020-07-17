@@ -12,12 +12,9 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
 
     return new Promise(function (resolve, reject) {
         table = $('#' + idTable).DataTable(
-            { 
-                "sDom": 'T<"clear">lfrtip<"clear spacer">T',
-                "oTableTools": {
-                    "aButtons": [ "copy", "print" ]
-                },
-                "order": false,// [[0, "desc"]],
+            {
+                
+                "order": [[0, "desc"]],
                 'language': {
                     "sProcessing": "<div class='lds-roller'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>",
                     "sLengthMenu": "Xem _MENU_ mục",
@@ -35,12 +32,6 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                         "sLast": "Cuối"
                     }
                 },
-                "columnDefs": [
-                    {
-                        "targets": -1,
-                        "className": "hover",
-                    },
-                ],
                 "processing": true,
                 rowId: '_id',
                 "serverSide": true,
@@ -77,6 +68,11 @@ function TaoDataTable(idTable, columns) {//, columns, id, isFilter) {
                 "drawCallback": function (settings) {
 
                 },
+                "columnDefs": [{
+                    "targets": 'no-sort',
+                    "orderable": false,
+                    "order": []
+                }],
                 "deferRender": true,
             });
     });
@@ -89,7 +85,7 @@ function search1() {
     let endDate = $('#endDate').val();
     let fee = $('#traPhi:checkbox:checked').length;
     multiSearch = { status, startDate, endDate, fee };
-    table.ajax.reload(null,false);
+    table.ajax.reload(null, false);
 }
 
 function ShowSession(id) {
@@ -103,9 +99,9 @@ function ShowSession(id) {
         $('#idTitlePopup').text(`DANH SÁCH SESSION ${event.name}`);
         $('#OrderDetail').text('');
         let baseURLWeb = '';
-        let length = arr.length-1;
+        let length = arr.length - 1;
         arr.forEach((e, i) => {
-            let template = `<div class="col-sm-6 left padding-left-right-0-m" style='margin-left: ${((i==length)?((i+1)%2==0?'0px':'25%'):'0px')}'>
+            let template = `<div class="col-sm-6 left padding-left-right-0-m" style='margin-left: ${((i == length) ? ((i + 1) % 2 == 0 ? '0px' : '25%') : '0px')}'>
                 <div class="card">
                     <div class="card-cover relative lazyload-hot-event"
                         data-src="${event.bannerUrl}"
@@ -195,7 +191,7 @@ function Delete(id, status = 'CANCEL') {
                 console.log(data);
                 alert(`${data.message}`);
             } else {
-                table.ajax.reload(null,false);
+                table.ajax.reload(null, false);
             }
             document.querySelector('.lds-default').classList.toggle('hidden');
         }).fail(err => {
@@ -207,7 +203,7 @@ function Delete(id, status = 'CANCEL') {
 }
 
 $(document).ready(function () {
-    
+
     document.querySelector('.lds-default').classList.toggle('hidden');
     $('#startDate').datetimepicker({
         lang: 'vi',

@@ -8,13 +8,12 @@ module.exports = (app) => {
 
     passport.serializeUser((user, done) => {
         //2
-        return done(null, user._id);
+         done(null, user);
     });
 
     passport.deserializeUser((id, done) => {
         // save req.user
-        console.log(id)
-        return done(null, id);
+        done(null, id);
     });
 
     var ls = new LocalStrategy({
@@ -30,7 +29,6 @@ module.exports = (app) => {
             if (!account) {
                 return done(null, false, { message: 'username || password incorrect' });
             }
-
             return done(null, account)
         } catch (error) {
             return done(null, false, { message: 'Something wrong' });

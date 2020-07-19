@@ -97,10 +97,6 @@ function Delete(_id) {
     }
 }
 
-function Update(id) {
-    // get data ve
-}
-
 function search1() {
 
     table.ajax.reload();
@@ -125,8 +121,7 @@ $(document).ready(function () {
         });
     }).call(this);
 
-    $('#idBranch').select2();
-    $('#idDepartment').select2();
+   
     $('#btnAdd').click(() => {
         $('#idTitlePopup').text(`THÊM NGƯỜI DÙNG`);
         // load data branch and department ra.

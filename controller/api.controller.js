@@ -362,7 +362,6 @@ module.exports = {
                     arrayFilters: [{ "elem.isCancel": { $ne: true }, "elem.status": { $ne: 'CANCEL' } }]
                 };
                 if (status != "CANCEL") {
-                    console.log(1);
                     update1 = { $set: { "status": status } };
                     multi1 = { multi: false };
                 }
@@ -673,13 +672,13 @@ module.exports = {
             if (!user) {
                 return res.status(600).json({ message: info.message, code: 620 });
             }
-
             req.logIn(user._id, function (err) {
                 if (err) {
                     return res.status(600).json({ message: err });
                 }
-                res.redirect('/');
-                // return res.status(200).json({ result: user });
+                
+                // res.redirect('/');
+                return res.status(200).json({ result: user });
             });
         })(req, res, next);
     },

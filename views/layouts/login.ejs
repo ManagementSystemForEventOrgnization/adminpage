@@ -1,14 +1,15 @@
 <%- contentFor('body') %>
 
     <div class="wrapper">
-        <form class="form-signin" action='/api/login' method="POST">
+        <form class="form-signin" action="/login" method="POST">
+            <span style='color: red;'><%=message%></span>
             <h2 class="form-signin-heading">Please login</h2>
             <input type="text" class="form-control" id="username"
-                name="username" placeholder="Username" required="" autofocus="">
+                name="username" placeholder="Username" required="" focus="">
             <input type="password" class="form-control" id="password"
                 name="password" placeholder="Password" required="">
-            <input class="btn btn-lg btn-primary btn-block" id="login" value="LOGIN" type="submit"
-                ></input>
+            <a class="btn btn-lg btn-primary btn-block" onclick="Login()" id="login" type="button"
+                >Login</a>
         </form>
     </div>
     <script
@@ -18,7 +19,8 @@
             $(document).keypress(function (event) {
                 var keycode = (event.keyCode ? event.keyCode : event.which);
                 if (keycode == '13') {
-                    Login();
+                    // Login();
+                    $('#login').click();
                 }
             });
         });
@@ -33,7 +35,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '/api/login',
+                url: '/login',
                 data: { username, password },
 
             }).done((data) => {

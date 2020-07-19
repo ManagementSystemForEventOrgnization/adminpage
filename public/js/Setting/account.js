@@ -129,6 +129,8 @@ function search1() {
 
 $(document).ready(function () {
 
+    // $('#idBranch').select2();
+    // $('#idDepartment').select2();
     (()=>{
         $.post('/api/Branch',(data,status)=>{
             let element = $('#idBranch');
@@ -145,8 +147,6 @@ $(document).ready(function () {
         });
     }).call(this);
 
-    $('#idBranch').select2();
-    $('#idDepartment').select2();
     $('#btnAdd').click(() => {
         $('#idTitlePopup').text(`THÊM NGƯỜI DÙNG`);
         // load data branch and department ra.

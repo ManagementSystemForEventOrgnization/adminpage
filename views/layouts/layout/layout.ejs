@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
     <link rel="stylesheet" type="text/css" href="/layout/dataTable.css" />
     <!-- <link rel="stylesheet" href="/dist/DataTable/css.css"> -->
-    <link href="/plugins/select2.css" rel="stylesheet" />
+    <!-- <link href="/plugins/select2.css" rel="stylesheet" /> -->
     <link rel="stylesheet" type="text/css" href="/plugins/jquery.datetimepicker.css" />
     <link rel="stylesheet" href="/dist/css/chatBox.css?ver=192" />
     
@@ -230,21 +230,20 @@
                     </li>
                     <!-- drop profine menu -->
                     <li class="nav-item dropdown user-menu">
-                        <a class="nav-link dropdown-toggle"
-                            id="navbarDropdownMenuLink"
-                            data-toggle="dropdown" aria-haspopup="true"
+                        <a class="nav-link dropdown-toggle" id='btnLogout'
+                            href='javascript: void(0);'
                             aria-expanded="false">
                             <img src="http://via.placeholder.com/160x160"
                                 class="user-image" alt="User Image">
-                            <span class="hidden-xs">ADMIN</span>
+                            <span class="hidden-xs">LOGOUT</span>
                         </a>
-                        <div class="dropdown-menu"
+                        <!-- <div class="dropdown-menu"
                             aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="#">Action</a>
                             <a class="dropdown-item" href="#">Another action</a>
                             <a class="dropdown-item" href="#">Something else
                                 here</a>
-                        </div>
+                        </div> -->
                     </li>
                 </ul>
             </div>
@@ -272,7 +271,7 @@
         </div> 
     </div>
     <div class="main">
-        <aside class="m-0 row" style="position: relative; top: 0; z-index: 1; height: 100vh;">
+        <aside class="m-0 row" style="position: relative; top: 0; z-index: 1; min-height: calc(100vh - 57px);">
             <div class="sidebar left" style=" top: 0; bottom: 0; left: 0; display: block; z-index: 1;color: #fff; font-weight: 200; background-size: cover; background-position: 50%;">
                 <div class="user-panel" onclick="document.location.href='/'" style="cursor: pointer;">
                     <!-- <a href='/'  > -->

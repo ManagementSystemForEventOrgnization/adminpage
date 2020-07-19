@@ -14,8 +14,6 @@ module.exports = {
       mUserId: 'NULL',
       Active: 'home'
     };
-    // console.log(req.user);
-    // send_notification('Test thong baos 1')
     res.render('home', {
       // additional locals, a custom layout, or other options can be defined here
     });
@@ -33,7 +31,7 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
-  approve_event: async(req,res,next)=>{
+  approve_event: async (req, res, next) => {
     res.locals = {
       title: 'approve_event',
       message: 'This is a message',
@@ -46,7 +44,7 @@ module.exports = {
       // additional locals, a custom layout, or other options can be defined here
     });
   },
-  require_edit_event: async(req,res,next)=>{
+  require_edit_event: async (req, res, next) => {
     res.locals = {
       title: 'require_edit_event',
       message: 'This is a message',
@@ -204,12 +202,17 @@ module.exports = {
   login: async (req, res, next) => {
 
     res.locals = {
-      title: 'ApplyEvent',
-      message: 'This is a message',
+      title: 'Login',
+      message: '',
       layout: 'layout'
     };
     res.render('login', {
     })
+  },
+
+  logout: async (req, res, next) => {
+    req.logOut();
+    res.status(200).json(req.user);
   },
 
   thu: async (req, res, next) => {

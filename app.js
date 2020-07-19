@@ -3,10 +3,12 @@ const app = express();
 const keys = require('./config/key');
 const mongoose = require('mongoose');
 mongoose.connect(keys.mongoURI,  {useNewUrlParser: true, useUnifiedTopology: true,'useCreateIndex': true, useFindAndModify: false });
+require('./config/loadMongoose');
 
 require('./config/configApp')(app);
-require('./config/loadMongoose');
+
 require('./config/pushRouter')(app);
+
 require('./utils/passport_login')(app);
 //Xử lý error 404
 // app.use((req, res, next)=>{

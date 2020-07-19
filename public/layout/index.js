@@ -2,6 +2,13 @@ $(document).ready(function(){
     $('.button-left').click(function(){
         $('.sidebar').toggleClass('fliph');
     });
+
+    $('#btnLogout').click(()=>{
+        $.get(`/logout`,(d,s)=>{
+            window.location.href = '/login';
+        });
+
+    })
     
  });
 

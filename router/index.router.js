@@ -52,4 +52,5 @@ router.get('/require_edit_event',auth, indexController.require_edit_event)
 
 router.get('/thanh_toan',auth, indexController.thanh_toan);
 
+
 module.exports = router;

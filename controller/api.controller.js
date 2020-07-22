@@ -141,6 +141,24 @@ module.exports = {
             res.status(422).json({ message: 'Không có thông tin' });
         } else {
             try {
+                // reject nó ra khỏi event trước khi xóa nó đi.....
+                let isApply = await ApplyEvent.findOne({
+                    userId: ObjectId('5ec8cff211a11d17ae93aed3'),
+                    $or: [
+                        { 'session': { $elemMatch: { isCancel: {$ne: true}, isReject: false, day: {$gte : new Date()} , isRefund: false, paymentStatus: 'PAID' } } },
+                        { 'session': { $elemMatch: { isCancel: {$ne: true}, isReject: false, day: {$gte : new Date()}, paymentId: { $exists: false } } } }
+                    ]
+                });
+
+                if(isApply){
+                    res.status(600).json({message: 'exists'});
+                    return;
+                }
+                
+                return;
+
+                // check xem usser nay có đang trong tham gia sự kiện nào mà chưa refund hay không. nếu có thì phải refund.
+
                 let isDelete = await User.findByIdAndUpdate({ _id: ObjectId(_id) }, { $set: { "dateDelete": new Date().toString() } });
                 if (isDelete) {
                     res.status(200).json({ message: 'success' });
@@ -588,7 +606,7 @@ module.exports = {
         let conditionFilter = {};
         let multi = {
             multi: true,
-            arrayFilters: [{ "elem.isReject": false, "elem.id": { $in: sessionId } }]
+            arrayFilters: [{ "elem.isReject": false, 'elem.isRefund': false, "elem.id": { $in: sessionId } }]
         };
         if (sessionId) {
             conditionFilter = { $in: ["$$item.id", sessionId] };
@@ -638,6 +656,7 @@ module.exports = {
                     }).then(d => {
                         callBack(true, i)
                     }).catch(e => {
+                        console.log(e.response.data);
                         callBack(false, i)
                     });
             }
@@ -651,11 +670,12 @@ module.exports = {
                     return;
                 }
             }
-
             for (let i = 0; i < session.length; i++) {
                 let element = session[i];
                 let sessionId = element.id;
                 let paymentId = element.paymentId;
+                console.log(sessionId)
+                console.log(paymentId)
                 if (paymentId)
                     func(eventId, sessionId, joinUserId, paymentId, i, callBack)
             }
@@ -676,7 +696,7 @@ module.exports = {
                 if (err) {
                     return res.status(600).json({ message: err });
                 }
-                
+
                 // res.redirect('/');
                 return res.status(200).json({ result: user });
             });

@@ -217,7 +217,7 @@ module.exports = {
     },
 
     get_payment_event: async (req,res,next)=>{
-// id của event
+        // id của event
         let {id} = req.params;
         if(!id){
             return res.status(600).json({message: 'Invalid data'});
@@ -228,6 +228,16 @@ module.exports = {
 
         res.status(200).json({data: payment}); 
 
+    },
+
+    get_notification: async (req,res,next)=>{
+
+        let e = null;
+        try {
+            e = await Notification
+        } catch (error) {
+            
+        }
     }
 
 

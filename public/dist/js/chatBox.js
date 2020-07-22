@@ -103,11 +103,12 @@ class ChatBox {
                                 this.prependAdminChat({ id: user.id, src: e.sender, content: e.content })
                             }
                         });
-                        res('true');
+                        res(arr.length);
                     })
                 }
                 func().then(d => {
-                    this.appendLoadMore(v);
+                    if (+d == 50)
+                        this.appendLoadMore(v);
                 })
             });
         }
@@ -357,9 +358,9 @@ function addNewUser(v) {
         if (!checkBoxExits[0]) {
 
             let numRead = $(`#numberMessage${v.id}`).text();
-            if(numRead){
+            if (numRead) {
                 // sang1
-                socket.emit('update-read', { user : v });
+                socket.emit('update-read', { user: v });
                 $(`#numberMessage${v.id}`).text('');
             }
 
@@ -379,13 +380,14 @@ function addNewUser(v) {
 
                         });
 
-                        res('res');
+                        res(arr.length);
                     })
 
                 }
 
                 func().then(dd => {
-                    chatBox.appendLoadMore(v);
+                    if (dd == 50)
+                        chatBox.appendLoadMore(v);
                 }
                 ).catch(er => {
 

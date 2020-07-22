@@ -92,6 +92,11 @@ function Delete(_id) {
                 table.ajax.reload();
             }
         }).fail(err => {
+            if(err.responseJSON.message=="exists"){
+                alert('Người dùng có tham gia sự kiện vui lòng kiểm tra lại.');
+
+                return;
+            }
             alert(err.responseJSON.message);
         })
 

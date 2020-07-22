@@ -179,7 +179,7 @@ function ShowSessionApply(id){
 function Delete(id) {
     // reject all session of user
    
-    if (confirm("Xác nhận xóa!")) {
+    if (confirm("Xác nhận!")) {
         document.querySelector('.lds-default').classList.toggle('hidden');
         $.ajax({
             type: 'POST',

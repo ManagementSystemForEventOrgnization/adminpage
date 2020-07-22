@@ -458,14 +458,18 @@ module.exports = {
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
         let conditionMain = { 'eventId': ObjectId(idEvent) };
-        conditionMain.session = { $elemMatch: { isCancel: { $ne: true } } }
+        conditionMain.$or = [
+            { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentStatus: 'PAID' } } },
+            { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, paymentId: { $exists: false } } } }
+        ]
+        // conditionMain.session = { $elemMatch: { isCancel: { $ne: true }, isRefund: false, paymentStatus: 'PAID' } }
         if (idSession) {
             conditionMain.session.$elemMatch.id = idSession;// = { $elemMatch: { id: idSession, status: 'JOINED', isReject: false } }
         }
         Promise.all([
             ApplyEvent.countDocuments(conditionMain),
             ApplyEvent.aggregate([
-                { $match: { 'eventId': ObjectId(idEvent), session: { $elemMatch: { isCancel: { $ne: true } } } } },
+                { $match: conditionMain },
                 {
                     $lookup:
                     {
@@ -576,7 +580,14 @@ module.exports = {
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
         let conditionMain = { 'eventId': ObjectId(idEvent) };
-        conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true, paymentId: { $exists: true } } }
+        
+        conditionMain.$or = [
+            { 'session': { $elemMatch: { isCancel: true, isReject: false, paymentStatus: 'PAID' } } },
+            { 'session': { $elemMatch: { isCancel: true, isReject: false, paymentId: { $exists: false } } } }
+        ]
+
+
+        // conditionMain.session = { $elemMatch: { isRefund: false, isCancel: true, paymentId: { $exists: true } } }
 
         Promise.all([
             ApplyEvent.countDocuments(conditionMain),
@@ -658,7 +669,7 @@ module.exports = {
                     s5: value.users[0].phone || '0',
                     s6: `<div class="moveClick" onclick="ShowSessionApply('${value._id}')" > ${value.session.length || '0'} </div>`,
                     s7: formatDate(value.createdAt),
-                    s8: value.qrcode,
+                    s8: value.qrcode || '',
                     s9: ('WAITING'),
                     s10: `<a title='Refund' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-check"></i></a>`, // can them cac button vao.
                 })
@@ -1079,8 +1090,8 @@ module.exports = {
         let orderDir = req.query.order[0].dir;
         let PageNo = req.query.start;
         let pageSize = req.query.length;
-        let query = { status: 'PAID', sender: { $ne: ObjectId(key.adminId) } };
-        query.sender = { $ne: ObjectId(key.adminId) }
+        let query = { status: 'PAID', sender: { $ne: ObjectId(key.adminId) }, sessionRefunded : {$size : 0} };
+        // query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
                 Payment.aggregate([
@@ -1173,7 +1184,7 @@ module.exports = {
         let pageSize = req.query.length;
 
         let query = { status: 'PAID', sender: { $ne: ObjectId(key.adminId) } };
-        query.sender = { $ne: ObjectId(key.adminId) }
+        // query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
                 Payment.aggregate([
@@ -1303,7 +1314,7 @@ module.exports = {
         let pageSize = req.query.length;
 
         let query = { status: 'PAID', sender: ObjectId(key.adminId) };
-        query.sender = { $ne: ObjectId(key.adminId) }
+        // query.sender = { $ne: ObjectId(key.adminId) }
         Promise.all(
             [
                 Payment.aggregate([
@@ -1356,8 +1367,6 @@ module.exports = {
                             amount: 1,
                             description: 1, event: 1,
                             payType: 1,
-                            num: { $size: '$session' },
-                            num1: { $size: '$sessionRefunded' }
                         }
                     },
                     { $skip: +PageNo },
@@ -1379,11 +1388,11 @@ module.exports = {
             arr.forEach((value, index) => {
                 arrDT.push({
                     s1: +index + 1 + +PageNo,
-                    s2: value.senders.fullName || 'Null',
+                    s2: value.senders.fullName || 'ADMIN',
                     s3: value.receivers.fullName || "No_Name",
                     s4: new Date(value.createdAt).toLocaleString() || "Null",
                     s5: value.payType || '',
-                    s6: formatCurrency((((+value.amount || '0') / +value.num) * (+value.num1)) + ''),
+                    s6: formatCurrency((((+value.amount || '0')) + '')),
                     s7: value.event.name || '',
                     s8: value.description || '',
                     // `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
@@ -1398,7 +1407,7 @@ module.exports = {
     thanh_toan: async (req, res) => {
         let search = req.query.myCustomParams;
         let { status, startDate, endDate, fee } = req.query.multiSearch;
-        
+
         let draw = req.query.draw;
         let order = req.query.order[0].column;
         let orderDir = req.query.order[0].dir;

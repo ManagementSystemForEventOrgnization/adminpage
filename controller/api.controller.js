@@ -137,6 +137,7 @@ module.exports = {
     },
     deleteUser: async (req, res) => {
         let { _id } = req.body;
+        console.log(_id);
         if (typeof _id === undefined) {
             res.status(422).json({ message: 'Không có thông tin' });
         } else {
@@ -155,7 +156,6 @@ module.exports = {
                     return;
                 }
                 
-                return;
 
                 // check xem usser nay có đang trong tham gia sự kiện nào mà chưa refund hay không. nếu có thì phải refund.
 
@@ -674,8 +674,6 @@ module.exports = {
                 let element = session[i];
                 let sessionId = element.id;
                 let paymentId = element.paymentId;
-                console.log(sessionId)
-                console.log(paymentId)
                 if (paymentId)
                     func(eventId, sessionId, joinUserId, paymentId, i, callBack)
             }

@@ -59,7 +59,7 @@ module.exports = {
   },
   user: async (req, res, next) => {
     res.locals = {
-      title: 'Event',
+      title: 'User',
       message: 'This is a message',
       Ten: 'sang',
       mUserId: 'NULL',
@@ -86,7 +86,7 @@ module.exports = {
   },
   traTienKhach: async (req, res, next) => {
     res.locals = {
-      title: 'Người dùng',
+      title: 'Refund tiền',
       message: 'This is a message',
       Ten: 'sang',
       mUserId: 'NULL',
@@ -227,7 +227,7 @@ module.exports = {
 
   refund: async (req, res, next) => {
     res.locals = {
-      title: 'Thu',
+      title: 'Refund',
       message: 'This is a message',
       Active: '.refund #products'
     };

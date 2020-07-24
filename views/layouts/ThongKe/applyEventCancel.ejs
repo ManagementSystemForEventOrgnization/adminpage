@@ -48,7 +48,7 @@
 </style>
 <%- contentFor('body') %>
     <div class="row">
-        
+
     </div>
     <div class="row">
         <div class="col-lg-12" style="margin: auto">
@@ -58,68 +58,72 @@
                         tham gia <%=event.name %> chưa được refund</h3>
                         <!-- <a href="./ThemPhieuYeuCau.aspx" class="btn bg-gradient-success btn-themmoi"><i class="fas fa-plus"></i></a> -->
                     </div>
-                    <div class="card-body p-0" style="width:
-                        auto; overflow-x:
-                        auto;">
+                    <div class="card-body p-0" style="width: auto; overflow:
+                    auto;">
                         <div class="wrap">
                             <div class="container">
-                        <table class="table table-bordered"
-                            id="idDataTable">
-                            <thead>
-                                <tr>
-                                    <th style="max-width: 50px">#</th>
-                                    <th>Tên người tham gia</th>
-                                    <th>Email</th>
-                                    <th>Giới tính</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Số lượng session</th>
-                                    <th>Thời gian đăng kí</th>
-                                    <th>Mã QR</th>
-                                    <th>Trạng thái</th>
-                                    <th>Chức năng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                        </div></div>
+                                <table class="table table-bordered"
+                                    id="idDataTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="max-width: 50px">#</th>
+                                            <th>Tên người tham gia</th>
+                                            <th>Email</th>
+                                            <th>Giới tính</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Số lượng session</th>
+                                            <th>Thời gian đăng kí</th>
+                                            <th>Mã QR</th>
+                                            <th>Trạng thái</th>
+                                            <th>Chức năng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div></div>
                     </div>
                     <!-- /.card-body -->
                 </div>
             </div>
-    </div>
+        </div>
 
-    
-    <div id="lightOrderDetail" class="white_content" style="width: 80%;
-    left: 10%; top: 10%!important; height: 80vh; overflow-y: auto;">
-    <div class="box" style="position: relative;">
-        <div style="position: absolute; top: 3px; right: 3px; font-size: 37px; color: red; cursor: pointer;" onclick="document.getElementById('lightOrderDetail').style.display=
-        'none'; document.getElementById('fadeOrderDetail').style.display=
-        'none'; $('#OrderDetail').text('');">X</div>
-        <div class="box-body">
-            <div class="titlePouple" style="text-align: center;
-                font-size: 2rem; width: 100%; height: auto!important;overflow-x: auto;" id="idTitlePopup">Thêm thông tin</div>
-            <div id="OrderDetail" style="padding: 10px; text-align:
-                center">
 
-                <!-- <div class="box-footer" style="margin-top: 2rem;">
+        <div id="lightOrderDetail" class="white_content" style="width: 80%;
+            left: 10%; top: 10%!important; height: 80vh; overflow-y: auto;">
+            <div class="box" style="position: relative;">
+                <div style="position: absolute; top: 3px; right: 3px; font-size:
+                    37px; color: red; cursor: pointer;"
+                    onclick="document.getElementById('lightOrderDetail').style.display=
+                    'none';
+                    document.getElementById('fadeOrderDetail').style.display=
+                    'none'; $('#OrderDetail').text('');">X</div>
+                <div class="box-body">
+                    <div class="titlePouple" style="text-align: center;
+                        font-size: 2rem; width: 100%; height:
+                        auto!important;overflow-x: auto;" id="idTitlePopup">Thêm
+                        thông tin</div>
+                    <div id="OrderDetail" style="padding: 10px; text-align:
+                        center">
+
+                        <!-- <div class="box-footer" style="margin-top: 2rem;">
                     <a class="btn btn-primary" id='buttonSave'>Xác nhận
                     </a>
                 </div> -->
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    </div>
-    <div id="fadeOrderDetail"
-        onclick="document.getElementById('lightOrderDetail').style.display=
-        'none'; document.getElementById('fadeOrderDetail').style.display=
-        'none'; $('#OrderDetail').text('');" class="black_overlay">
-    </div>
+        <div id="fadeOrderDetail"
+            onclick="document.getElementById('lightOrderDetail').style.display=
+            'none'; document.getElementById('fadeOrderDetail').style.display=
+            'none'; $('#OrderDetail').text('');" class="black_overlay">
+        </div>
 
 
-    <script src='/js/ThongKe/applyEventCancel.js?ver=132'></script>
-    <script src='/js/search.js?ver=132' async></script>
-    <script>
+        <script src='/js/ThongKe/applyEventCancel.js?ver=132'></script>
+        <script src='/js/search.js?ver=132' async></script>
+        <script>
         $(document).ready(function () {
             TaoDataTable("idDataTable", GetColumnsForDatatable(10)).then(() => {
                 SettingSearch();

@@ -732,7 +732,6 @@ module.exports = {
                     s7: value.phone || '',
                     s8: formatDate(value.dateCreate) || 'NaN',
                     s9: `<a title='Xóa' href='javascript:void(0);' onclick='Delete("${value._id}")' class='btn btn-danger'><i class="fa fa-trash-o"></i></a>
-                        <a title='Sửa' href='javascript:void(0);' onclick='Update("${value._id}")' class='btn btn-warning'><i class="fas fa-pen-alt"></i></a>        
                         `, // can them cac button vao.
                 })
             });

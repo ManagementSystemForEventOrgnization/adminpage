@@ -582,7 +582,7 @@ module.exports = {
         let conditionMain = { 'eventId': ObjectId(idEvent) };
         
         conditionMain.$or = [
-            { 'session': { $elemMatch: { isCancel: true, isReject: false, paymentStatus: 'PAID' } } },
+            { 'session': { $elemMatch: { isCancel: true, isReject: false, isRefund: false , paymentStatus: 'PAID' } } },
             { 'session': { $elemMatch: { isCancel: true, isReject: false, paymentId: { $exists: false } } } }
         ]
 
@@ -1423,7 +1423,6 @@ module.exports = {
         let conditionSort = {};
         conditionSort[`${arrSort[+order]}`] = (orderDir == 'desc' ? (-1) : (1));
 
-        let countDocument = Event.countDocuments();
 
         Promise.all([
             Event.aggregate([

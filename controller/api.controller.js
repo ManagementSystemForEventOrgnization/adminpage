@@ -613,7 +613,7 @@ module.exports = {
             condition.session = { $elemMatch: { id: { $in: sessionId }, isReject: false } };
             multi.arrayFilters = [{ "elem.isReject": false, "elem.id": { $in: sessionId } }];
         } else {
-            conditionFilter = { $eq: ["$$item.isReject", false] };
+            conditionFilter = { $eq: ["$$item.isRefund", false] };
             condition.session = { $elemMatch: { isReject: false } };
             multi.arrayFilters = [{ "elem.isReject": false }];
         }
@@ -676,6 +676,7 @@ module.exports = {
                 let paymentId = element.paymentId;
                 if (paymentId)
                     func(eventId, sessionId, joinUserId, paymentId, i, callBack)
+                
             }
         })
     },

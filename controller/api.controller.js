@@ -146,16 +146,16 @@ module.exports = {
                 let isApply = await ApplyEvent.findOne({
                     userId: ObjectId('5ec8cff211a11d17ae93aed3'),
                     $or: [
-                        { 'session': { $elemMatch: { isCancel: {$ne: true}, isReject: false, day: {$gte : new Date()} , isRefund: false, paymentStatus: 'PAID' } } },
-                        { 'session': { $elemMatch: { isCancel: {$ne: true}, isReject: false, day: {$gte : new Date()}, paymentId: { $exists: false } } } }
+                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, day: { $gte: new Date() }, isRefund: false, paymentStatus: 'PAID' } } },
+                        { 'session': { $elemMatch: { isCancel: { $ne: true }, isReject: false, day: { $gte: new Date() }, paymentId: { $exists: false } } } }
                     ]
                 });
 
-                if(isApply){
-                    res.status(600).json({message: 'exists'});
+                if (isApply) {
+                    res.status(600).json({ message: 'exists' });
                     return;
                 }
-                
+
 
                 // check xem usser nay có đang trong tham gia sự kiện nào mà chưa refund hay không. nếu có thì phải refund.
 
@@ -609,12 +609,12 @@ module.exports = {
             arrayFilters: [{ "elem.isReject": false, 'elem.isRefund': false, "elem.id": { $in: sessionId } }]
         };
         if (sessionId) {
-            conditionFilter = { $in: ["$$item.id", sessionId] };
-            condition.session = { $elemMatch: { id: { $in: sessionId }, isReject: false } };
+            conditionFilter = { $and: [{ $in: ["$$item.id", sessionId] }, { $eq: ["$$item.isCancel", true] }] };
+            condition.session = { $elemMatch: { id: { $in: sessionId }, isReject: false, isCancel: true } };
             multi.arrayFilters = [{ "elem.isReject": false, "elem.id": { $in: sessionId } }];
         } else {
-            conditionFilter = { $eq: ["$$item.isRefund", false] };
-            condition.session = { $elemMatch: { isReject: false } };
+            conditionFilter = { $and: [{ $eq: ["$$item.isRefund", false] }, { $eq: ["$$item.isCancel", true] }] };
+            condition.session = { $elemMatch: { isReject: false, isCancel: true } };
             multi.arrayFilters = [{ "elem.isReject": false }];
         }
         Promise.all([
@@ -665,18 +665,18 @@ module.exports = {
                     status += i + ", ";
                 }
                 if (i == length - 1) {
-                    console.log(status);
                     res.status(200).json(status);
                     return;
                 }
             }
+
             for (let i = 0; i < session.length; i++) {
                 let element = session[i];
                 let sessionId = element.id;
                 let paymentId = element.paymentId;
                 if (paymentId)
                     func(eventId, sessionId, joinUserId, paymentId, i, callBack)
-                
+
             }
         })
     },

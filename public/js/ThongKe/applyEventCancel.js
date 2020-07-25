@@ -186,7 +186,6 @@ function Delete(id) {
             url: '/api/event/reject_user',
             data: { applyEventId: id },
         }).done((data) => {
-            console.log(data);
             appendAlert(data || 'Success',10000);
             document.getElementById('lightOrderDetail').style.display = 'none';
             document.getElementById('fadeOrderDetail').style.display = 'none';
